@@ -8,7 +8,7 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from database import get_db
-from models import User
+from models import User, RoleEnum
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
@@ -54,3 +54,13 @@ def get_current_user(
     if user is None:
         raise credentials_exception
     return user
+
+def require_admin(
+    current_user: User = Depends(get_current_user),
+):
+    if current_user.role != RoleEnum.admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges required"
+        )
+    return current_user

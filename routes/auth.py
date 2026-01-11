@@ -56,6 +56,12 @@ def login(
             detail="Incorrect email or password"
         )
 
+    if not user.is_active:
+        raise HTTPException(
+            status_code=403,
+            detail="Account is inactive or blocked"
+        )
+
     access_token = create_access_token(
         data={"sub": str(user.id)}
     )
