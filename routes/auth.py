@@ -41,11 +41,6 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    if user.role in ["seller", "shipper"]:
-        # pseudo-code
-        # notify_profile_service(new_user.id, user.role)
-        pass
-
     return new_user
 
 @router.post("/login", response_model=Token)
