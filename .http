@@ -1,0 +1,34 @@
+@base_url = http://127.0.0.1:8000
+
+### 1️⃣ Root
+GET {{base_url}}/
+Accept: application/json
+
+
+### 2️⃣ Register
+POST {{base_url}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "shipper_test@local.com",
+  "password": "123",
+  "role": "shipper"
+}
+
+
+### 3️⃣ Login
+POST {{base_url}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "shipper@local.com",
+  "password": "123"
+}
+
+
+### 4️⃣ Me (copy access_token từ login vào đây)
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2IiwiZXhwIjoxNzY4MTQ1NzkyfQ.EtQoRmFTIWGTU3iLs_XThGNdY2fnRXZ99N027s86U5o
+
+GET {{base_url}}/auth/me
+Authorization: Bearer {{token}}
+Accept: application/json

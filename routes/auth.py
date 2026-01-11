@@ -1,13 +1,11 @@
 import os
 
-from datetime import timedelta
 from fastapi import Depends, HTTPException, status, APIRouter
-from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from database import get_db
 from models import User
-from schemas import UserCreate, UserResponse, Token
+from schemas import UserCreate, UserResponse, Token, LoginRequest
 
 from utils import hash_password, verify_password, create_access_token, get_current_user
 
@@ -24,32 +22,53 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already exists")
 
+    if user.role == "admin":
+        raise HTTPException(status_code=400, detail="Cannot register admin accounts")
+
+    if user.role == "user":
+        is_active = True
+    else:
+        is_active = False
+
     new_user = User(
         email=user.email,
-        hashed_password=hash_password(user.password)
+        hashed_password=hash_password(user.password),
+        role=user.role,
+        is_active=is_active
     )
+
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+
+    if user.role in ["seller", "shipper"]:
+        # pseudo-code
+        # notify_profile_service(new_user.id, user.role)
+        pass
+
     return new_user
 
 @router.post("/login", response_model=Token)
 def login(
-    form_data: OAuth2PasswordRequestForm = Depends(),
+    data: LoginRequest,
     db: Session = Depends(get_db)
 ):
-    user = db.query(User).filter(User.email == form_data.username).first()
-    if not user or not verify_password(form_data.password, user.hashed_password):
+    user = db.query(User).filter(User.email == data.email).first()
+
+    if not user or not verify_password(data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password"
         )
 
     access_token = create_access_token(
-        data={"sub": user.id},
-        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        data={"sub": str(user.id)}
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
 
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(get_current_user)):
