@@ -1,17 +1,47 @@
-version: "3.8"
-
 services:
+  # PostgreSQL Database
   db:
     image: postgres:16.9
+    container_name: driver-services-db
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1
-      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: driver_services
     ports:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
-      - ./dump/db/db_dump.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - driver-services-network
+
+  # Driver Services API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: driver-services-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=driver_services;Username=postgres;Password=postgres
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - driver-services-network
+    restart: unless-stopped
 
 volumes:
   db_data:
+    driver: local
+
+networks:
+  driver-services-network:
+    driver: bridge
