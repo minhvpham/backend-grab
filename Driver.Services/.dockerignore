@@ -1,23 +1,43 @@
-**/.dockerignore
-**/.git
-**/.gitignore
-**/.vs
-**/.vscode
-**/*.*proj.user
-**/*.dbmdl
-**/*.jfm
-**/bin
-**/charts
-**/docker-compose*
-**/compose*
-**/Dockerfile*
-**/node_modules
-**/npm-debug.log
-**/obj
-**/secrets.dev.yaml
-**/values.dev.yaml
-**/.idea
-**/.DS_Store
-**/dump
-LICENSE
+# Build artifacts
+**/bin/
+**/obj/
+**/*.dll
+**/*.exe
+**/*.pdb
+**/*.user
+
+# IDE and editor files
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+
+# Docker files
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Documentation
 README.md
+*.md
+docs/
+
+# Test and temporary files
+dump/req/
+**/*.tmp
+**/*.log
+
+# OpenSpec
+openspec/
+
+# OS files
+.DS_Store
+Thumbs.db

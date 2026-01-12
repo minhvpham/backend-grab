@@ -1,216 +1,236 @@
 # Driver Services API
 
-A complete microservice for managing drivers, their locations, wallets, and trip histories built with Clean Architecture, CQRS, and Domain-Driven Design.
-
-## Features
-
-- **Driver Management**: Register, verify, and manage driver profiles
-- **Location Tracking**: Real-time GPS location tracking with nearby driver search
-- **Wallet System**: Digital wallet with transactions, COD handling, and balance management
-- **Trip History**: Complete order delivery lifecycle tracking
+A microservice for managing driver operations in a delivery/ride-hailing system, built with Clean Architecture principles using .NET 8.
 
 ## Architecture
 
-- **Clean Architecture** with separated layers (Domain, Application, Infrastructure, API)
-- **CQRS Pattern** with MediatR for command/query separation
-- **Domain-Driven Design** with aggregates, value objects, and domain events
-- **Repository Pattern** with Unit of Work for data access
-- **Entity Framework Core** with PostgreSQL database
+This project follows **Clean Architecture** with the following layers:
 
-## Tech Stack
+- **Driver.Services.Domain**: Core business logic and domain entities
+- **Driver.Services.Application**: Use cases and application logic (CQRS with MediatR)
+- **Driver.Services.Infrastructure**: Data access and external dependencies (EF Core + PostgreSQL)
+- **Driver.Services.Api**: Web API endpoints (REST)
 
-- **.NET 8.0**
-- **ASP.NET Core Web API**
-- **Entity Framework Core 8.0**
-- **PostgreSQL 16**
-- **MediatR** for CQRS
-- **FluentValidation** for validation
-- **Swagger/OpenAPI** for API documentation
+## Core Features
 
-## Quick Start
+1. **Driver Profile Management**: Registration, verification, vehicle information
+2. **Driver Status Management**: Online/Offline/Busy status tracking
+3. **Driver Location Tracking**: Real-time GPS location updates
+4. **Driver Wallet Management**: COD balance, earnings, withdrawals
+5. **Order Dispatching**: Assign orders to drivers
+6. **Trip History**: Order tracking and earnings calculation
 
-### Prerequisites
+## Technology Stack
 
-- Docker & Docker Compose
+- **.NET 8** - Runtime framework
+- **Entity Framework Core 8** - ORM
+- **PostgreSQL** - Primary database
+- **MediatR** - CQRS pattern implementation
+- **FluentValidation** - Input validation
+- **JWT Authentication** - Security
+- **Swagger/OpenAPI** - API documentation
 
-### Run with Docker Compose
-
-```bash
-# Start the entire application stack (PostgreSQL + API)
-docker-compose up -d
-
-# View logs
-docker-compose logs -f api
-
-# Stop services
-docker-compose down
-
-# Stop and remove volumes (clean database)
-docker-compose down -v
-```
-
-The API will be available at:
-- **API**: http://localhost:8080
-- **Swagger UI**: http://localhost:8080/swagger
-- **Health Check**: http://localhost:8080/health
-
-The database migrations are automatically applied on startup!
-
-## Development Setup (Without Docker)
+## Getting Started
 
 ### Prerequisites
 
-- .NET 8.0 SDK
-- PostgreSQL 16
-- dotnet-ef tool: `dotnet tool install --global dotnet-ef`
+- Docker & Docker Compose (for containerized setup)
+- .NET 8 SDK (for local development)
 
-### Steps
+### Quick Start with Docker (Recommended)
 
-1. **Update Connection String** (if needed):
+1. **Start the entire stack** (API + PostgreSQL):
    ```bash
-   # Edit Driver.Services.Api/appsettings.json
+   docker-compose up -d
+   ```
+
+2. **Access the services**:
+   - API: http://localhost:8081
+   - Swagger UI: http://localhost:8081/swagger
+   - PostgreSQL: localhost:5433 (user: postgres, password: postgres, db: driver_services)
+
+3. **View logs**:
+   ```bash
+   docker-compose logs -f driver-services-api
+   ```
+
+4. **Stop all services**:
+   ```bash
+   docker-compose down
+   ```
+
+5. **Reset database** (removes all data):
+   ```bash
+   docker-compose down -v
+   docker-compose up -d
+   ```
+
+### Local Development Setup
+
+1. **Start PostgreSQL Database**:
+   ```bash
+   docker-compose up -d driver-services-db
+   ```
+
+2. **Configure connection string** in `appsettings.Development.json`:
+   ```json
    "ConnectionStrings": {
-     "DefaultConnection": "Host=localhost;Port=5432;Database=driver_services;Username=postgres;Password=postgres"
+     "DefaultConnection": "Host=localhost;Port=5433;Database=driver_services;Username=postgres;Password=postgres"
    }
    ```
 
-2. **Apply Migrations**:
-   ```bash
-   cd Driver.Services
-   dotnet ef database update --project Driver.Services.Infrastructure --startup-project Driver.Services.Api
-   ```
-
-3. **Run the API**:
+3. **Run the API locally**:
    ```bash
    cd Driver.Services.Api
    dotnet run
    ```
 
-4. **Access Swagger**: https://localhost:5001/swagger
+4. **Access Swagger UI**:
+   Navigate to `http://localhost:5001/swagger`
 
-## API Endpoints
+### Configuration
 
-### Drivers
-- `POST /api/drivers` - Register new driver
-- `GET /api/drivers/{id}` - Get driver by ID
-- `GET /api/drivers` - Get drivers with filters (status, verification, pagination)
-- `PUT /api/drivers/{id}/profile` - Update driver profile
-- `PUT /api/drivers/{id}/vehicle` - Update vehicle information
-- `POST /api/drivers/{id}/verify` - Verify driver
-- `POST /api/drivers/{id}/reject` - Reject driver verification
-- `PATCH /api/drivers/{id}/status` - Change driver status
+#### Environment Variables
 
-### Driver Locations
-- `POST /api/drivers/{driverId}/location` - Update driver location
-- `GET /api/drivers/{driverId}/location` - Get driver current location
-- `GET /api/drivers/nearby` - Find nearby drivers (radius search)
+The following environment variables can be configured in `docker-compose.yml`:
 
-### Driver Wallets
-- `GET /api/drivers/{driverId}/wallet/balance` - Get wallet balance
-- `GET /api/drivers/{driverId}/wallet/transactions` - Get transaction history
-- `POST /api/drivers/{driverId}/wallet/add-funds` - Add funds to wallet
-- `POST /api/drivers/{driverId}/wallet/collect-cash` - Record COD collection
-- `POST /api/drivers/{driverId}/wallet/return-cash` - Return cash to balance
+**PostgreSQL**:
+- `POSTGRES_USER` - Database user (default: postgres)
+- `POSTGRES_PASSWORD` - Database password (default: postgres)
+- `POSTGRES_DB` - Database name (default: driver_services)
 
-### Trips
-- `POST /api/trips` - Create new trip
-- `GET /api/trips/{id}` - Get trip by ID
-- `GET /api/trips/driver/{driverId}` - Get driver trips
-- `PATCH /api/trips/{id}/status` - Update trip status
-- `POST /api/trips/{id}/complete` - Complete trip
-- `POST /api/trips/{id}/cancel` - Cancel trip
+**API**:
+- `ASPNETCORE_ENVIRONMENT` - Environment (Development/Production)
+- `ConnectionStrings__DefaultConnection` - PostgreSQL connection string
+
+#### Configuration Files
+
+Configuration is stored in `appsettings.json` and `appsettings.Development.json`:
+
+- **ConnectionStrings:DefaultConnection**: PostgreSQL connection string
+- **JwtSettings**: JWT token configuration (SecretKey, Issuer, Audience, ExpirationMinutes)
+
+For production deployments, use environment variables or secrets management instead of `appsettings.json`.
+
+### Development
+
+Build the entire solution:
+```bash
+dotnet build
+```
+
+Run tests:
+```bash
+dotnet test
+```
+
+#### Docker Development Workflow
+
+**Rebuild after code changes**:
+```bash
+docker-compose up -d --build
+```
+
+**Access database directly**:
+```bash
+docker exec -it driver-services-db psql -U postgres -d driver_services
+```
+
+**View container status**:
+```bash
+docker-compose ps
+```
+
+**Clean rebuild** (removes old images):
+```bash
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d
+```
 
 ## Project Structure
 
 ```
 Driver.Services/
-├── Driver.Services.Domain/          # Domain entities, value objects, interfaces
-│   ├── AggregatesModel/
-│   │   ├── DriverAggregate/
-│   │   ├── DriverLocationAggregate/
-│   │   ├── DriverWalletAggregate/
-│   │   └── TripHistoryAggregate/
-│   ├── Abstractions/
-│   └── Exceptions/
-├── Driver.Services.Application/     # CQRS commands, queries, handlers
-│   ├── Common/
-│   ├── Drivers/
-│   ├── DriverLocations/
-│   ├── DriverWallets/
-│   └── TripHistories/
-├── Driver.Services.Infrastructure/  # EF Core, repositories, persistence
-│   └── Persistence/
-│       ├── Configurations/
-│       ├── Repositories/
-│       └── Migrations/
-├── Driver.Services.Api/             # REST API controllers, middleware
-│   └── Controllers/
-├── docker-compose.yml
-└── Dockerfile
+├── Driver.Services.Api/          # Web API layer
+│   ├── Endpoints/                # Endpoint groups
+│   ├── Identity/                 # Authentication/Authorization
+│   └── Program.cs                # Entry point
+├── Driver.Services.Application/  # Application layer
+│   ├── Common/                   # Shared application logic
+│   │   ├── Behaviours/          # MediatR pipeline behaviors
+│   │   ├── Interfaces/          # Application interfaces
+│   │   └── Models/              # DTOs and view models
+│   └── UseCases/                # CQRS commands and queries
+├── Driver.Services.Infrastructure/ # Infrastructure layer
+│   ├── Data/                    # EF Core DbContext and configurations
+│   ├── Repositories/            # Repository implementations
+│   └── DependencyInjection.cs   # Infrastructure DI registration
+└── Driver.Services.Domain/       # Domain layer
+    ├── Abstractions/            # Base classes and interfaces
+    ├── AggregatesModel/         # Domain aggregates
+    │   ├── DriverAggregate/
+    │   ├── DriverLocationAggregate/
+    │   ├── DriverWalletAggregate/
+    │   └── TripHistoryAggregate/
+    ├── Constants/               # Domain constants
+    ├── Events/                  # Domain events
+    └── Exceptions/              # Domain exceptions
+```
+
+## API Endpoints
+
+### Driver Management
+- `POST /api/drivers/register` - Register a new driver
+- `PUT /api/drivers/{id}/verify` - Verify driver documents
+- `GET /api/drivers/{id}` - Get driver profile
+- `PUT /api/drivers/{id}/vehicle` - Update vehicle information
+
+### Status & Location
+- `PUT /api/drivers/{id}/status` - Update driver status (Online/Offline/Busy)
+- `POST /api/drivers/{id}/location` - Update driver location
+- `GET /api/drivers/nearby` - Get nearby available drivers
+
+### Orders & Trips
+- `POST /api/orders/dispatch` - Dispatch order to driver
+- `GET /api/drivers/{id}/trips` - Get driver trip history
+- `GET /api/drivers/{id}/earnings` - Get driver earnings
+
+### Wallet
+- `GET /api/drivers/{id}/wallet` - Get wallet details
+- `POST /api/drivers/{id}/wallet/deposit` - Record COD deposit
+- `POST /api/drivers/{id}/wallet/withdraw` - Process withdrawal
+
+## Authentication
+
+The API uses JWT Bearer authentication with role-based authorization:
+
+- **Driver**: Access to own profile and operations
+- **Dispatcher**: Assign orders to drivers
+- **Admin**: Full system access
+
+Include JWT token in request headers:
+```
+Authorization: Bearer {your-token}
 ```
 
 ## Database Schema
 
-### Tables
-- **Drivers** - Driver profiles with vehicle info
-- **DriverLocations** - GPS location tracking
-- **DriverWallets** - Wallet balances and totals
-- **Transactions** - Financial transaction history
-- **TripHistories** - Order delivery lifecycle
+### Core Tables
+- **Drivers**: Driver profiles and verification status
+- **DriverLocations**: Real-time GPS tracking
+- **DriverWallets**: Financial operations and balances
+- **TripHistory**: Order tracking and earnings
 
-## Configuration
+## Development Roadmap
 
-### Environment Variables
-
-- `ASPNETCORE_ENVIRONMENT` - Development/Production
-- `ASPNETCORE_URLS` - Listening URLs (default: http://+:8080)
-- `ConnectionStrings__DefaultConnection` - PostgreSQL connection string
-
-### appsettings.json
-
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=driver_services;Username=postgres;Password=postgres"
-  }
-}
-```
-
-## Docker Commands
-
-```bash
-# Build image
-docker-compose build
-
-# View logs
-docker-compose logs -f
-
-# Restart API only
-docker-compose restart api
-
-# Access database
-docker exec -it driver-services-db psql -U postgres -d driver_services
-
-# View running containers
-docker-compose ps
-```
-
-## Health Checks
-
-The API includes a health endpoint:
-
-```bash
-curl http://localhost:8080/health
-```
-
-Response:
-```json
-{
-  "status": "healthy",
-  "timestamp": "2026-01-12T17:44:18.123Z"
-}
-```
+- [x] Phase 1: Project setup and infrastructure
+- [ ] Phase 2: Domain layer implementation
+- [ ] Phase 3: Application layer (use cases)
+- [ ] Phase 4: Infrastructure layer (data access)
+- [ ] Phase 5: API layer (endpoints)
+- [ ] Phase 6: Testing and documentation
 
 ## License
 
-MIT License
+Proprietary - All rights reserved
