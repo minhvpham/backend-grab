@@ -8,6 +8,14 @@ import enum
 from .database import Base
 
 
+class UserRole(str, enum.Enum):
+    """User roles in the system"""
+    USER = "user"
+    SELLER = "seller"
+    SHIPPER = "shipper"
+    ADMIN = "admin"
+
+
 class OrderStatus(str, enum.Enum):
     """Order status enum"""
     PENDING = "pending"
@@ -27,12 +35,35 @@ class PaymentStatus(str, enum.Enum):
     REFUNDED = "refunded"
 
 
+class User(Base):
+    """User model for database"""
+    __tablename__ = "users"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String(255), nullable=False)
+    email = Column(String(255), unique=True, nullable=False, index=True)
+    phone = Column(String(20), unique=True, nullable=False, index=True)
+    password = Column(String(255), nullable=False)
+    role = Column(String(20), default="user", nullable=False)
+    avatar = Column(String(500), nullable=True)
+    address = Column(Text, nullable=True)
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationship to orders
+    orders = relationship("Order", back_populates="user")
+
+    def __repr__(self):
+        return f"<User(id={self.id}, name={self.name}, email={self.email})>"
+
+
 class Order(Base):
     """Order model for database"""
     __tablename__ = "orders"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), nullable=False, index=True)  # FK to User service
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
     restaurant_id = Column(UUID(as_uuid=True), nullable=False, index=True)  # FK to Restaurant service
     driver_id = Column(UUID(as_uuid=True), nullable=True, index=True)  # FK to Driver service
     
@@ -52,6 +83,7 @@ class Order(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
+    user = relationship("User", back_populates="orders")
     items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
 
     def __repr__(self):

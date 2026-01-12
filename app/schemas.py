@@ -1,8 +1,52 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List
 from datetime import datetime
 from enum import Enum
 from decimal import Decimal
+
+
+# ========== User Enums & Schemas ==========
+
+class UserRole(str, Enum):
+    USER = "user"
+    SELLER = "seller"
+    SHIPPER = "shipper"
+    ADMIN = "admin"
+
+
+class UserCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=255)
+    email: EmailStr
+    phone: str = Field(..., min_length=10, max_length=20)
+    password: str = Field(..., min_length=8)
+    role: UserRole = Field(default=UserRole.USER)
+    avatar: Optional[str] = None
+    address: Optional[str] = None
+
+
+class UserUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=255)
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = Field(None, min_length=10, max_length=20)
+    password: Optional[str] = Field(None, min_length=8)
+    role: Optional[UserRole] = None
+    avatar: Optional[str] = None
+    address: Optional[str] = None
+
+
+class UserResponse(BaseModel):
+    id: str
+    name: str
+    email: str
+    phone: str
+    role: UserRole
+    avatar: Optional[str]
+    address: Optional[str]
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
 
 
 # ========== Order Enums & Schemas ==========
@@ -87,6 +131,19 @@ class OrderResponse(BaseModel):
 
 
 # ========== Response Wrappers ==========
+
+class UserListResponse(BaseModel):
+    success: bool = True
+    message: str = "Success"
+    data: List[UserResponse]
+    total: int
+
+
+class UserSingleResponse(BaseModel):
+    success: bool = True
+    message: str = "Success"
+    data: UserResponse
+
 
 class OrderListResponse(BaseModel):
     success: bool = True
