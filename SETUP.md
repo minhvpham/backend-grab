@@ -23,6 +23,26 @@ docker-compose up -d
 
 ## 📖 API Endpoints
 
+### Users CRUD (MỚI)
+
+| Method | Endpoint | Mô tả | Request Body |
+|--------|----------|-------|--------------|
+| `POST` | `/api/v1/users` | Tạo user mới | `{name, email, phone, password, role}` |
+| `GET` | `/api/v1/users` | Lấy danh sách users | - |
+| `GET` | `/api/v1/users/{id}` | Lấy chi tiết user | - |
+| `PUT` | `/api/v1/users/{id}` | Cập nhật user | `{name?, email?, role?}` |
+| `DELETE` | `/api/v1/users/{id}` | Xóa user | - |
+
+### User Roles
+| Role | Mô tả |
+|------|-------|
+| `user` | Khách hàng |
+| `seller` | Chủ nhà hàng |
+| `shipper` | Tài xế giao hàng |
+| `admin` | Quản trị viên |
+
+---
+
 ### Orders CRUD
 
 | Method | Endpoint | Mô tả | Request Body |
@@ -47,6 +67,19 @@ docker-compose up -d
 
 ## 📝 Ví dụ Request
 
+### Tạo User mới
+```json
+POST /api/v1/users
+{
+  "name": "Nguyễn Văn A",
+  "email": "nguyenvana@gmail.com",
+  "phone": "0901234567",
+  "password": "123456",
+  "role": "user",
+  "address": "123 Nguyễn Huệ, Q1, TP.HCM"
+}
+```
+
 ### Tạo đơn hàng mới
 ```json
 POST /api/v1/orders
@@ -64,14 +97,6 @@ POST /api/v1/orders
       "unit_price": 50000
     }
   ]
-}
-```
-
-### Cập nhật trạng thái đơn
-```json
-PUT /api/v1/orders/{order_id}
-{
-  "status": "confirmed"
 }
 ```
 
@@ -100,11 +125,15 @@ PUT /api/v1/orders/{order_id}
 postgresql://postgres:1@localhost:5434/order_service_db
 ```
 
+### Sample Data
+- 6 users mẫu
+- 5 orders mẫu
+- 11 order items mẫu
+
 ### Dump database (sau khi thay đổi):
 ```bash
 ./dump-db-script.sh
 ```
-
 ---
 
 ## 🔧 Trạng thái đơn hàng (Order Status)
@@ -126,12 +155,11 @@ postgresql://postgres:1@localhost:5434/order_service_db
 
 | Service | Port |
 |---------|------|
-| User Service API | 8001 |
+| Auth Service API | 8001 |
 | **Order Service API** | **8002** |
-| Driver Service API | TBD |
-| User Service DB | 5433 |
+| Restaurant Service API | 8003 |
+| Driver Service API | 8004 |
 | **Order Service DB** | **5434** |
-| Driver Service DB | 5432 |
 
 ---
 

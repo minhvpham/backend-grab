@@ -1,49 +1,139 @@
 # Order Service API
 
-Microservice quản lý đơn hàng cho hệ thống Giao Hàng Thực Phẩm.
+Microservice quản lý **Đơn hàng** và **Người dùng** cho hệ thống Giao Hàng Thực Phẩm (Food Delivery).
 
-## Tech Stack
-- **Framework**: FastAPI (Python 3.11)
-- **Database**: PostgreSQL 16
-- **Container**: Docker
+## 🛠️ Tech Stack
 
-## Quick Start
+| Công nghệ | Version | Mô tả |
+|-----------|---------|-------|
+| **FastAPI** | 0.109.0 | Web Framework |
+| **SQLAlchemy** | 2.0.25 | ORM |
+| **PostgreSQL** | 16 | Database |
+| **Docker** | - | Container |
+| **Pydantic** | 2.5.3 | Data Validation |
+
+## 🚀 Quick Start
 
 ```bash
 # Chạy với Docker
 docker-compose up -d
 
-# API sẽ chạy tại: http://localhost:8002
-# Swagger docs: http://localhost:8002/docs
+# API: http://localhost:8002
+# Swagger UI: http://localhost:8002/docs
 ```
 
-## API Endpoints
+## 📊 Database Schema
+
+### Users Table
+| Column | Type | Description |
+|--------|------|-------------|
+| id | UUID | Primary Key |
+| name | VARCHAR(255) | Tên người dùng |
+| email | VARCHAR(255) | Email (unique) |
+| phone | VARCHAR(20) | Số điện thoại (unique) |
+| password | VARCHAR(255) | Mật khẩu (SHA256 hash) |
+| role | VARCHAR(20) | user / seller / shipper / admin |
+| avatar | VARCHAR(500) | URL avatar |
+| address | TEXT | Địa chỉ |
+
+### Orders Table
+| Column | Type | Description |
+|--------|------|-------------|
+| id | UUID | Primary Key |
+| user_id | UUID | FK to users |
+| restaurant_id | UUID | FK to Restaurant Service |
+| driver_id | UUID | FK to Driver Service |
+| status | VARCHAR(30) | Trạng thái đơn |
+| payment_status | VARCHAR(20) | unpaid / paid / refunded |
+| total_amount | NUMERIC(12,2) | Tổng tiền |
+
+### Order Items Table
+| Column | Type | Description |
+|--------|------|-------------|
+| id | UUID | Primary Key |
+| order_id | UUID | FK to orders |
+| product_name | VARCHAR(255) | Tên sản phẩm |
+| quantity | INTEGER | Số lượng |
+| unit_price | NUMERIC(12,2) | Đơn giá |
+
+## 📡 API Endpoints
+
+### Users API (5 endpoints)
 
 | Method | Endpoint | Mô tả |
 |--------|----------|-------|
-| GET | `/api/v1/orders` | Lấy danh sách đơn hàng |
+| POST | `/api/v1/users` | Tạo user mới |
+| GET | `/api/v1/users` | Lấy danh sách users |
+| GET | `/api/v1/users/{id}` | Lấy chi tiết user |
+| PUT | `/api/v1/users/{id}` | Cập nhật user |
+| DELETE | `/api/v1/users/{id}` | Xóa user |
+
+### Orders API (10 endpoints)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
 | POST | `/api/v1/orders` | Tạo đơn hàng mới |
+| GET | `/api/v1/orders` | Lấy danh sách đơn hàng |
 | GET | `/api/v1/orders/{id}` | Lấy chi tiết đơn hàng |
 | PUT | `/api/v1/orders/{id}` | Cập nhật đơn hàng |
 | DELETE | `/api/v1/orders/{id}` | Xóa đơn hàng |
 | POST | `/api/v1/orders/{id}/cancel` | Hủy đơn hàng |
 | GET | `/api/v1/orders/user/{user_id}` | Lấy đơn hàng theo user |
 | GET | `/api/v1/orders/driver/{driver_id}` | Lấy đơn hàng theo driver |
-| GET | `/api/v1/orders/restaurant/{restaurant_id}` | Lấy đơn hàng theo nhà hàng |
+| GET | `/api/v1/orders/restaurant/{id}` | Lấy đơn hàng theo nhà hàng |
 | POST | `/api/v1/orders/{id}/assign-driver` | Gán driver cho đơn hàng |
 
-## Database
+## 🔄 Order Status Flow
 
-Port: `5434` (tránh conflict với User Service `5433`)
-
-```bash
-# Dump database
-./dump-db-script.sh
+```
+pending → confirmed → preparing → ready → finding_driver → delivering → delivered
+                                                                    ↘ cancelled
 ```
 
-## Ports
+## 📁 Project Structure
+
+```
+order-service/
+├── app/
+│   ├── main.py          # FastAPI entry point
+│   ├── models.py        # SQLAlchemy models
+│   ├── schemas.py       # Pydantic schemas
+│   ├── crud.py          # Database operations
+│   ├── database.py      # DB connection
+│   └── routers/
+│       ├── orders.py    # Order endpoints
+│       └── users.py     # User endpoints
+├── dump/db/
+│   └── init.sql         # Database initialization
+├── docker-compose.yml
+├── Dockerfile
+├── requirements.txt
+└── README.md
+```
+
+## 🔌 Ports
 
 | Service | Port |
 |---------|------|
 | Order Service API | 8002 |
 | PostgreSQL | 5434 |
+
+## 🧪 Sample Data
+
+Database được khởi tạo với:
+- 6 users mẫu (3 user, 2 shipper, 1 admin)
+- 5 orders mẫu với các trạng thái khác nhau
+- 11 order items mẫu
+
+## 👥 Team
+
+| Thành viên | Service |
+|------------|---------|
+| Mphuc310771 | Order Service |
+| minhvpham | Restaurant Service |
+| Duyyy123 | Driver Service |
+| HCMUS-HQHuy | Auth Service |
+
+## 📄 License
+
+MIT License
