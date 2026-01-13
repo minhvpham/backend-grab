@@ -57,11 +57,17 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 // Add MediatR and Application layer dependencies
 builder.Services.AddMediatR(cfg =>
 {
-    cfg.RegisterServicesFromAssembly(typeof(Driver.Services.Application.AssemblyReference).Assembly);
+    cfg.RegisterServicesFromAssembly(
+        typeof(Driver.Services.Application.AssemblyReference).Assembly
+    );
     // Register pipeline behaviors
     cfg.AddOpenBehavior(typeof(Driver.Services.Application.Common.Behaviours.LoggingBehaviour<,>));
-    cfg.AddOpenBehavior(typeof(Driver.Services.Application.Common.Behaviours.ValidationBehaviour<,>));
-    cfg.AddOpenBehavior(typeof(Driver.Services.Application.Common.Behaviours.TransactionBehaviour<,>));
+    cfg.AddOpenBehavior(
+        typeof(Driver.Services.Application.Common.Behaviours.ValidationBehaviour<,>)
+    );
+    cfg.AddOpenBehavior(
+        typeof(Driver.Services.Application.Common.Behaviours.TransactionBehaviour<,>)
+    );
 });
 builder.Services.AddValidatorsFromAssembly(
     typeof(Driver.Services.Application.AssemblyReference).Assembly
@@ -81,6 +87,11 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<DriverServicesDbContext>();
+
+    // Apply pending migrations
+    await context.Database.MigrateAsync();
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Driver Services API v1"));
 }
