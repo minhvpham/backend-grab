@@ -1,8 +1,9 @@
-from pydantic import BaseModel, EmailStr, Field
-from typing import Optional, List
+from pydantic import BaseModel, EmailStr, Field, field_serializer
+from typing import Optional, List, Any
 from datetime import datetime
 from enum import Enum
 from decimal import Decimal
+from uuid import UUID
 
 
 # ========== User Enums & Schemas ==========
@@ -18,7 +19,7 @@ class UserCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     email: EmailStr
     phone: str = Field(..., min_length=10, max_length=20)
-    password: str = Field(..., min_length=8)
+    password: str = Field(..., min_length=6)
     role: UserRole = Field(default=UserRole.USER)
     avatar: Optional[str] = None
     address: Optional[str] = None
@@ -28,18 +29,18 @@ class UserUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=255)
     email: Optional[EmailStr] = None
     phone: Optional[str] = Field(None, min_length=10, max_length=20)
-    password: Optional[str] = Field(None, min_length=8)
+    password: Optional[str] = Field(None, min_length=6)
     role: Optional[UserRole] = None
     avatar: Optional[str] = None
     address: Optional[str] = None
 
 
 class UserResponse(BaseModel):
-    id: str
+    id: Any
     name: str
     email: str
     phone: str
-    role: UserRole
+    role: str
     avatar: Optional[str]
     address: Optional[str]
     created_at: datetime
@@ -47,6 +48,10 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+    
+    @field_serializer('id')
+    def serialize_id(self, v):
+        return str(v) if v else None
 
 
 # ========== Order Enums & Schemas ==========
@@ -78,8 +83,8 @@ class OrderItemCreate(BaseModel):
 
 
 class OrderItemResponse(BaseModel):
-    id: str
-    product_id: str
+    id: Any
+    product_id: Any
     product_name: str
     quantity: int
     unit_price: Decimal
@@ -88,6 +93,10 @@ class OrderItemResponse(BaseModel):
 
     class Config:
         from_attributes = True
+    
+    @field_serializer('id', 'product_id')
+    def serialize_uuid(self, v):
+        return str(v) if v else None
 
 
 # Order Schemas
@@ -109,10 +118,10 @@ class OrderUpdate(BaseModel):
 
 
 class OrderResponse(BaseModel):
-    id: str
-    user_id: str
-    restaurant_id: str
-    driver_id: Optional[str]
+    id: Any
+    user_id: Any
+    restaurant_id: Any
+    driver_id: Optional[Any]
     status: str
     payment_status: str
     payment_method: Optional[str]
@@ -128,6 +137,10 @@ class OrderResponse(BaseModel):
 
     class Config:
         from_attributes = True
+    
+    @field_serializer('id', 'user_id', 'restaurant_id', 'driver_id')
+    def serialize_uuid(self, v):
+        return str(v) if v else None
 
 
 # ========== Response Wrappers ==========
