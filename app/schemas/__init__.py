@@ -4,10 +4,24 @@ from app.schemas.restaurant import (
     RestaurantUpdate,
     RestaurantResponse
 )
+from app.schemas.menu import (
+    CategoryCreate,
+    CategoryUpdate,
+    CategoryResponse,
+    MenuItemCreate,
+    MenuItemUpdate,
+    MenuItemResponse
+)
 
 __all__ = [
     "RestaurantBase",
     "RestaurantCreate",
     "RestaurantUpdate",
-    "RestaurantResponse"
+    "RestaurantResponse",
+    "CategoryCreate",
+    "CategoryUpdate",
+    "CategoryResponse",
+    "MenuItemCreate",
+    "MenuItemUpdate",
+    "MenuItemResponse"
 ]

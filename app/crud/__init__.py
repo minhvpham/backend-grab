@@ -6,6 +6,21 @@ from app.crud.restaurant import (
     delete_restaurant,
     get_restaurants_by_owner
 )
+from app.crud.menu import (
+    create_category,
+    get_category,
+    get_categories_by_restaurant,
+    update_category,
+    delete_category,
+    create_dish,
+    get_dish,
+    get_dishes_by_restaurant,
+    get_dishes_by_category,
+    update_dish,
+    toggle_dish_availability,
+    delete_dish,
+    get_dish_sold_quantity
+)
 
 __all__ = [
     "create_restaurant",
@@ -13,5 +28,18 @@ __all__ = [
     "get_restaurants",
     "update_restaurant",
     "delete_restaurant",
-    "get_restaurants_by_owner"
+    "get_restaurants_by_owner",
+    "create_category",
+    "get_category",
+    "get_categories_by_restaurant",
+    "update_category",
+    "delete_category",
+    "create_dish",
+    "get_dish",
+    "get_dishes_by_restaurant",
+    "get_dishes_by_category",
+    "update_dish",
+    "toggle_dish_availability",
+    "delete_dish",
+    "get_dish_sold_quantity"
 ]
