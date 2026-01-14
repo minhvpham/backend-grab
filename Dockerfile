@@ -1,6 +1,8 @@
 FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
 WORKDIR /app
 
 # Install system dependencies
@@ -9,21 +11,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Poetry
-RUN pip install --no-cache-dir poetry
+# Upgrade pip
+RUN pip install --no-cache-dir --upgrade pip
 
-# Copy dependency files
-COPY pyproject.toml poetry.lock* ./
+# Copy dependency file
+COPY requirements.txt .
 
-# Copy only necessary source code
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application source
 COPY main.py routes models schemas database utils script alembic alembic.ini README.md ./
 
-# Install dependencies
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi --no-root
+ENV PYTHONPATH=/app
 
 # Expose port
 EXPOSE 8000
 
 # Run FastAPI
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["fastapi", "run", "main.py", "--host", "0.0.0.0", "--port", "8000"]
