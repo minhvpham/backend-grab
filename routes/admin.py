@@ -4,7 +4,7 @@ from typing import List, Optional
 from sqlalchemy import asc, desc
 
 from database import get_db
-from models import User, RoleEnum
+from models import User, RoleEnum, UserStatusEnum
 from schemas.admin import AdminUserResponse
 from utils import require_admin
 
@@ -56,7 +56,7 @@ def block_user(
 @router.get("/users", response_model=List[AdminUserResponse])
 def list_users(
     role: Optional[RoleEnum] = Query(None, description="Filter by role"),
-    status: Optional[str] = Query(None, description="Filter by status: active, inactive"),
+    status: Optional[UserStatusEnum] = Query(None, description="Filter by status: active, inactive"),
     is_deleted: Optional[bool] = Query(False, description="Include deleted users"),
     sort_by: Optional[str] = Query("created_at", description="Sort by: created_at or updated_at"),
     order: Optional[str] = Query("desc", description="Order: asc or desc"),
@@ -65,13 +65,11 @@ def list_users(
 ):
     query = db.query(User).filter(User.id != admin.id)
 
-    if role:
+    if role is not None:
         query = query.filter(User.role == role)
 
-    if status == "active":
-        query = query.filter(User.is_active == True)
-    elif status == "inactive":
-        query = query.filter(User.is_active == False)
+    if status is not None:
+        query = query.filter(User.status == status)
 
     query = query.filter(User.is_deleted == is_deleted)
 

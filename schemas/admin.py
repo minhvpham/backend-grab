@@ -1,12 +1,12 @@
 from pydantic import BaseModel, EmailStr
-from typing import List, Optional
 from datetime import datetime
+from models import UserStatusEnum, RoleEnum
 
 class AdminUserResponse(BaseModel):
     id: int
     email: EmailStr
-    role: str
-    is_active: bool
+    role: RoleEnum
+    status: UserStatusEnum
     is_deleted: bool
     created_at: datetime
     updated_at: datetime

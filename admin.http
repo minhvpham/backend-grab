@@ -1,0 +1,35 @@
+@baseUrl = http://localhost:8000
+@adminToken = {{authresponse.response.body.access_token}}
+### 1️⃣ Root
+GET {{baseUrl}}/
+Accept: application/json
+
+### 3️⃣ Login
+# @name authresponse
+POST {{baseUrl}}/auth/login/admin
+Content-Type: application/json
+
+{
+  "email": "admin@local.com",
+  "password": "123"
+}
+###
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{adminToken}}
+Accept: application/json
+
+### Get all users
+GET {{baseUrl}}/admin/users
+Authorization: Bearer {{adminToken}}
+
+### Get users with role = user
+GET {{baseUrl}}/admin/users?role=user
+Authorization: Bearer {{adminToken}}
+
+### Get users with role = seller
+GET {{baseUrl}}/admin/users?role=seller
+Authorization: Bearer {{adminToken}}
+
+### Get users with role = shipper
+GET {{baseUrl}}/admin/users?role=shipper
+Authorization: Bearer {{adminToken}}

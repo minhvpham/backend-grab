@@ -80,7 +80,7 @@ def login(
         )
 
     # 3. Check status
-    if user.status != UserStatusEnum.active:
+    if user.status != UserStatusEnum.active and user.status != UserStatusEnum.pending:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"Account status is '{user.status}', login not allowed"
