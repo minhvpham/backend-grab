@@ -33,3 +33,11 @@ Authorization: Bearer {{adminToken}}
 ### Get users with role = shipper
 GET {{baseUrl}}/admin/users?role=shipper
 Authorization: Bearer {{adminToken}}
+
+###
+PATCH {{baseUrl}}/admin/users/6/status
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "active"
+}

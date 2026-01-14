@@ -13,3 +13,6 @@ class AdminUserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class UpdateUserStatusRequest(BaseModel):
+    status: UserStatusEnum

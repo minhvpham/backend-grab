@@ -5,7 +5,7 @@ from sqlalchemy import asc, desc
 
 from database import get_db
 from models import User, RoleEnum, UserStatusEnum
-from schemas.admin import AdminUserResponse
+from schemas.admin import AdminUserResponse, UpdateUserStatusRequest
 from utils import require_admin
 
 router = APIRouter(
@@ -13,11 +13,12 @@ router = APIRouter(
     tags=["Admin"]
 )
 
-@router.patch("/users/{user_id}/activate", response_model=AdminUserResponse)
-def activate_user(
+@router.patch("/users/{user_id}/status", response_model=AdminUserResponse)
+def update_user_status(
     user_id: int,
+    payload: UpdateUserStatusRequest,
     db: Session = Depends(get_db),
-    admin=Depends(require_admin)
+    admin=Depends(require_admin),
 ):
     user = db.query(User).filter(User.id == user_id).first()
 
@@ -25,29 +26,19 @@ def activate_user(
         raise HTTPException(status_code=404, detail="User not found")
 
     if user.role == RoleEnum.admin:
-        raise HTTPException(status_code=400, detail="Cannot modify admin")
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot modify admin account"
+        )
 
-    user.is_active = True
-    db.commit()
-    db.refresh(user)
+    # Optional: không cho admin tự update chính mình
+    if user.id == admin.id:
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot modify your own account"
+        )
 
-    return user
-
-@router.patch("/users/{user_id}/block", response_model=AdminUserResponse)
-def block_user(
-    user_id: int,
-    db: Session = Depends(get_db),
-    admin=Depends(require_admin)
-):
-    user = db.query(User).filter(User.id == user_id).first()
-
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    if user.role == RoleEnum.admin:
-        raise HTTPException(status_code=400, detail="Cannot block admin")
-
-    user.is_active = False
+    user.status = payload.status
     db.commit()
     db.refresh(user)
 
@@ -98,7 +89,7 @@ def soft_delete_user(
         raise HTTPException(status_code=400, detail="Cannot delete admin")
 
     user.is_deleted = True
-    user.is_active = False
+    user.status = UserStatusEnum.banned
     db.commit()
     db.refresh(user)
     return user
