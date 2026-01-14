@@ -8,6 +8,12 @@ class RoleEnum(str, enum.Enum):
     shipper = "shipper"
     admin = "admin"
 
+class UserStatusEnum(str, enum.Enum):
+    active = "active"        # Tài khoản hoạt động bình thường
+    inactive = "inactive"    # Bị admin vô hiệu hóa
+    pending = "pending"      # Chờ xác minh (email, KYC, ...)
+    banned = "banned"        # Bị cấm vĩnh viễn
+
 class User(Base):
     __tablename__ = "users"
     
@@ -15,7 +21,11 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     role = Column(Enum(RoleEnum), default=RoleEnum.user)
-    is_active = Column(Boolean, default=True)
+    status = Column(
+        Enum(UserStatusEnum, name="user_status_enum"),
+        default=UserStatusEnum.active,
+        nullable=False,
+    )
     is_deleted = Column(Boolean, default=False)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())

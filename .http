@@ -1,4 +1,4 @@
-@base_url = http://127.0.0.1:8000
+@base_url = http://localhost:8000
 
 ### 1️⃣ Root
 GET {{base_url}}/
@@ -10,24 +10,24 @@ POST {{base_url}}/auth/register
 Content-Type: application/json
 
 {
-  "email": "shipper_test@local.com",
+  "email": "shipper12@local.com",
   "password": "123",
   "role": "shipper"
 }
 
 
 ### 3️⃣ Login
-POST {{base_url}}/auth/login
+POST {{base_url}}/auth/login/seller
 Content-Type: application/json
 
 {
-  "email": "shipper@local.com",
+  "email": "seller@local.com",
   "password": "123"
 }
 
 
 ### 4️⃣ Me (copy access_token từ login vào đây)
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2IiwiZXhwIjoxNzY4MTQ1NzkyfQ.EtQoRmFTIWGTU3iLs_XThGNdY2fnRXZ99N027s86U5o
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMSIsInJvbGUiOiJzZWxsZXIiLCJleHAiOjE3Njg0MDg3NzZ9.8VIaFFZ9_PJ-vpvkXOdQpCU-1FkJ3Ux-u1s3O906BYI
 
 GET {{base_url}}/auth/me
 Authorization: Bearer {{token}}

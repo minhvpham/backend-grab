@@ -4,37 +4,50 @@ from fastapi import Depends, HTTPException, status, APIRouter
 from sqlalchemy.orm import Session
 
 from database import get_db
-from models import User
+from models import User, RoleEnum, UserStatusEnum
 from schemas import UserCreate, UserResponse, Token, LoginRequest
 
-from utils import hash_password, verify_password, create_access_token, get_current_user
+from utils import (
+    hash_password,
+    verify_password,
+    create_access_token,
+    get_current_user,
+)
 
-ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30)
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
 
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"]
 )
 
+
 @router.post("/register", response_model=UserResponse)
 def register(user: UserCreate, db: Session = Depends(get_db)):
+    # 1. Check email tồn tại
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already exists")
 
-    if user.role == "admin":
-        raise HTTPException(status_code=400, detail="Cannot register admin accounts")
+    # 2. Không cho tạo admin
+    if user.role == RoleEnum.admin:
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot register admin accounts"
+        )
 
-    if user.role == "user":
-        is_active = True
+    # 3. Set status theo role
+    if user.role == RoleEnum.user:
+        status_value = UserStatusEnum.active
     else:
-        is_active = False
+        status_value = UserStatusEnum.pending
 
+    # 4. Tạo user
     new_user = User(
         email=user.email,
         hashed_password=hash_password(user.password),
         role=user.role,
-        is_active=is_active
+        status=status_value,
     )
 
     db.add(new_user)
@@ -43,33 +56,49 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
     return new_user
 
-@router.post("/login", response_model=Token)
+
+@router.post("/login/{user_role}", response_model=Token)
 def login(
+    user_role: RoleEnum,
     data: LoginRequest,
     db: Session = Depends(get_db)
 ):
     user = db.query(User).filter(User.email == data.email).first()
 
+    # 1. Check credentials
     if not user or not verify_password(data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password"
         )
 
-    if not user.is_active:
+    # 2. Check role
+    if user.role != user_role:
         raise HTTPException(
-            status_code=403,
-            detail="Account is inactive or blocked"
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"User is not allowed to login as {user_role}"
         )
 
+    # 3. Check status
+    if user.status != UserStatusEnum.active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Account status is '{user.status}', login not allowed"
+        )
+
+    # 4. Create token
     access_token = create_access_token(
-        data={"sub": str(user.id)}
+        data={
+            "sub": str(user.id),
+            "role": user.role,
+        }
     )
 
     return {
         "access_token": access_token,
-        "token_type": "bearer"
+        "token_type": "bearer",
     }
+
 
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(get_current_user)):
