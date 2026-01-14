@@ -23,17 +23,17 @@ docker-compose up -d
 
 ## 📖 API Endpoints
 
-### Users CRUD (MỚI)
+### Profiles CRUD (MỚI)
 
 | Method | Endpoint | Mô tả | Request Body |
 |--------|----------|-------|--------------|
-| `POST` | `/api/v1/users` | Tạo user mới | `{name, email, phone, password, role}` |
-| `GET` | `/api/v1/users` | Lấy danh sách users | - |
-| `GET` | `/api/v1/users/{id}` | Lấy chi tiết user | - |
-| `PUT` | `/api/v1/users/{id}` | Cập nhật user | `{name?, email?, role?}` |
-| `DELETE` | `/api/v1/users/{id}` | Xóa user | - |
+| `POST` | `/api/v1/profiles` | Tạo profile mới | `{id, name, email, phone, password}` |
+| `GET` | `/api/v1/profiles` | Lấy danh sách profiles | - |
+| `GET` | `/api/v1/profiles/{id}` | Lấy chi tiết profile | - |
+| `PUT` | `/api/v1/profiles/{id}` | Cập nhật profile | `{name?, email?, role?}` |
+| `DELETE` | `/api/v1/profiles/{id}` | Xóa profile | - |
 
-### User Roles
+### Profile Roles
 | Role | Mô tả |
 |------|-------|
 | `user` | Khách hàng |
@@ -48,17 +48,17 @@ docker-compose up -d
 | Method | Endpoint | Mô tả | Request Body |
 |--------|----------|-------|--------------|
 | `GET` | `/api/v1/orders` | Lấy tất cả đơn hàng | - |
-| `POST` | `/api/v1/orders` | Tạo đơn hàng mới | `{user_id, restaurant_id, delivery_address, items[]}` |
+| `POST` | `/api/v1/orders` | Tạo đơn hàng mới | `{profile_id, restaurant_id, delivery_address, items[]}` |
 | `GET` | `/api/v1/orders/{id}` | Lấy chi tiết 1 đơn | - |
 | `PUT` | `/api/v1/orders/{id}` | Cập nhật đơn hàng | `{status?, driver_id?, ...}` |
 | `DELETE` | `/api/v1/orders/{id}` | Xóa đơn hàng | - |
 | `POST` | `/api/v1/orders/{id}/cancel` | Hủy đơn hàng | - |
 
-### Lấy đơn theo User/Driver/Restaurant
+### Lấy đơn theo Profile/Driver/Restaurant
 
 | Method | Endpoint | Mô tả |
 |--------|----------|-------|
-| `GET` | `/api/v1/orders/user/{user_id}` | Đơn hàng của user |
+| `GET` | `/api/v1/orders/profile/{profile_id}` | Đơn hàng của profile |
 | `GET` | `/api/v1/orders/driver/{driver_id}` | Đơn hàng của driver |
 | `GET` | `/api/v1/orders/restaurant/{restaurant_id}` | Đơn hàng của nhà hàng |
 | `POST` | `/api/v1/orders/{id}/assign-driver?driver_id=xxx` | Gán driver cho đơn |
@@ -67,15 +67,15 @@ docker-compose up -d
 
 ## 📝 Ví dụ Request
 
-### Tạo User mới
+### Tạo Profile mới
 ```json
-POST /api/v1/users
+POST /api/v1/profiles
 {
+  "id": "user_id_from_auth_service_123",
   "name": "Nguyễn Văn A",
   "email": "nguyenvana@gmail.com",
   "phone": "0901234567",
   "password": "123456",
-  "role": "user",
   "address": "123 Nguyễn Huệ, Q1, TP.HCM"
 }
 ```
@@ -84,7 +84,7 @@ POST /api/v1/users
 ```json
 POST /api/v1/orders
 {
-  "user_id": "550e8400-e29b-41d4-a716-446655440001",
+  "profile_id": "550e8400-e29b-41d4-a716-446655440001",
   "restaurant_id": "770e8400-e29b-41d4-a716-446655440001",
   "delivery_address": "123 Nguyễn Huệ, Q1, TP.HCM",
   "delivery_note": "Gọi trước khi giao",
@@ -107,7 +107,7 @@ POST /api/v1/orders
   "message": "Tạo đơn hàng thành công",
   "data": {
     "id": "660e8400-...",
-    "user_id": "550e8400-...",
+    "profile_id": "550e8400-...",
     "status": "pending",
     "total_amount": 115000,
     "items": [...]
@@ -126,7 +126,7 @@ postgresql://postgres:1@localhost:5434/order_service_db
 ```
 
 ### Sample Data
-- 6 users mẫu
+- 6 profiles mẫu
 - 5 orders mẫu
 - 11 order items mẫu
 

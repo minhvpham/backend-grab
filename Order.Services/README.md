@@ -1,6 +1,6 @@
 # Order Service API
 
-Microservice quản lý **Đơn hàng** và **Người dùng** cho hệ thống Giao Hàng Thực Phẩm (Food Delivery).
+Microservice quản lý **Đơn hàng** và **Hồ Sơ Người Dùng (Profile)** cho hệ thống Giao Hàng Thực Phẩm (Food Delivery).
 
 ## 🛠️ Tech Stack
 
@@ -24,7 +24,7 @@ docker-compose up -d
 
 ## 📊 Database Schema
 
-### Users Table
+### Profiles Table (Thông tin cá nhân)
 | Column | Type | Description |
 |--------|------|-------------|
 | id | UUID | Primary Key |
@@ -40,7 +40,7 @@ docker-compose up -d
 | Column | Type | Description |
 |--------|------|-------------|
 | id | UUID | Primary Key |
-| user_id | UUID | FK to users |
+| profile_id | UUID | FK to profiles |
 | restaurant_id | UUID | FK to Restaurant Service |
 | driver_id | UUID | FK to Driver Service |
 | status | VARCHAR(30) | Trạng thái đơn |
@@ -58,15 +58,15 @@ docker-compose up -d
 
 ## 📡 API Endpoints
 
-### Users API (5 endpoints)
+### Profiles API (5 endpoints)
 
 | Method | Endpoint | Mô tả |
 |--------|----------|-------|
-| POST | `/api/v1/users` | Tạo user mới |
-| GET | `/api/v1/users` | Lấy danh sách users |
-| GET | `/api/v1/users/{id}` | Lấy chi tiết user |
-| PUT | `/api/v1/users/{id}` | Cập nhật user |
-| DELETE | `/api/v1/users/{id}` | Xóa user |
+| POST | `/api/v1/profiles` | Tạo profile mới |
+| GET | `/api/v1/profiles` | Lấy danh sách profiles |
+| GET | `/api/v1/profiles/{id}` | Lấy chi tiết profile |
+| PUT | `/api/v1/profiles/{id}` | Cập nhật profile |
+| DELETE | `/api/v1/profiles/{id}` | Xóa profile |
 
 ### Orders API (10 endpoints)
 
@@ -78,7 +78,7 @@ docker-compose up -d
 | PUT | `/api/v1/orders/{id}` | Cập nhật đơn hàng |
 | DELETE | `/api/v1/orders/{id}` | Xóa đơn hàng |
 | POST | `/api/v1/orders/{id}/cancel` | Hủy đơn hàng |
-| GET | `/api/v1/orders/user/{user_id}` | Lấy đơn hàng theo user |
+| GET | `/api/v1/orders/profile/{profile_id}` | Lấy đơn hàng theo profile |
 | GET | `/api/v1/orders/driver/{driver_id}` | Lấy đơn hàng theo driver |
 | GET | `/api/v1/orders/restaurant/{id}` | Lấy đơn hàng theo nhà hàng |
 | POST | `/api/v1/orders/{id}/assign-driver` | Gán driver cho đơn hàng |
@@ -102,7 +102,7 @@ order-service/
 │   ├── database.py      # DB connection
 │   └── routers/
 │       ├── orders.py    # Order endpoints
-│       └── users.py     # User endpoints
+│       └── profiles.py  # Profile endpoints
 ├── dump/db/
 │   └── init.sql         # Database initialization
 ├── docker-compose.yml
@@ -121,7 +121,7 @@ order-service/
 ## 🧪 Sample Data
 
 Database được khởi tạo với:
-- 6 users mẫu (3 user, 2 shipper, 1 admin)
+- 6 profiles mẫu (3 user, 2 shipper, 1 admin)
 - 5 orders mẫu với các trạng thái khác nhau
 - 11 order items mẫu
 

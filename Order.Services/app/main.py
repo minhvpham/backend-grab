@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import engine, Base
-from .routers import orders, users
+from .routers import orders, profiles
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -10,7 +10,7 @@ Base.metadata.create_all(bind=engine)
 # Initialize FastAPI app
 app = FastAPI(
     title="Order Service API",
-    description="API quản lý người dùng và đơn hàng cho hệ thống Giao Hàng Thực Phẩm",
+    description="API quản lý Profile và Đơn hàng cho hệ thống Giao Hàng Thực Phẩm",
     version="1.0.0",
     docs_url="/docs",      # Swagger UI
     redoc_url="/redoc"     # ReDoc
@@ -26,7 +26,7 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(users.router, prefix="/api/v1")
+app.include_router(profiles.router, prefix="/api/v1")
 app.include_router(orders.router, prefix="/api/v1")
 
 

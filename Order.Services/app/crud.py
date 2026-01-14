@@ -20,14 +20,14 @@ def get_orders_count(db: Session) -> int:
     return db.query(models.Order).count()
 
 
-def get_orders_by_user(db: Session, user_id: str, skip: int = 0, limit: int = 100) -> List[models.Order]:
+def get_orders_by_profile(db: Session, profile_id: str, skip: int = 0, limit: int = 100) -> List[models.Order]:
     return db.query(models.Order).filter(
-        models.Order.user_id == uuid.UUID(user_id)
+        models.Order.profile_id == uuid.UUID(profile_id)
     ).order_by(models.Order.created_at.desc()).offset(skip).limit(limit).all()
 
 
-def get_orders_count_by_user(db: Session, user_id: str) -> int:
-    return db.query(models.Order).filter(models.Order.user_id == uuid.UUID(user_id)).count()
+def get_orders_count_by_profile(db: Session, profile_id: str) -> int:
+    return db.query(models.Order).filter(models.Order.profile_id == uuid.UUID(profile_id)).count()
 
 
 def get_orders_by_driver(db: Session, driver_id: str, skip: int = 0, limit: int = 100) -> List[models.Order]:
@@ -50,7 +50,7 @@ def create_order(db: Session, order: schemas.OrderCreate) -> models.Order:
     
     # Create order
     db_order = models.Order(
-        user_id=uuid.UUID(order.user_id),
+        profile_id=uuid.UUID(order.profile_id),
         restaurant_id=uuid.UUID(order.restaurant_id),
         delivery_address=order.delivery_address,
         delivery_note=order.delivery_note,

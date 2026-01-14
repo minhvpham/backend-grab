@@ -6,36 +6,36 @@ from decimal import Decimal
 from uuid import UUID
 
 
-# ========== User Enums & Schemas ==========
+# ========== Profile Enums & Schemas ==========
 
-class UserRole(str, Enum):
+class ProfileRole(str, Enum):
     USER = "user"
     SELLER = "seller"
     SHIPPER = "shipper"
     ADMIN = "admin"
 
 
-class UserCreate(BaseModel):
+class ProfileCreate(BaseModel):
+    id: str = Field(..., description="ID từ Auth Service")
     name: str = Field(..., min_length=1, max_length=255)
     email: EmailStr
     phone: str = Field(..., min_length=10, max_length=20)
     password: str = Field(..., min_length=6)
-    role: UserRole = Field(default=UserRole.USER)
     avatar: Optional[str] = None
     address: Optional[str] = None
 
 
-class UserUpdate(BaseModel):
+class ProfileUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=255)
     email: Optional[EmailStr] = None
     phone: Optional[str] = Field(None, min_length=10, max_length=20)
     password: Optional[str] = Field(None, min_length=6)
-    role: Optional[UserRole] = None
+    role: Optional[ProfileRole] = None
     avatar: Optional[str] = None
     address: Optional[str] = None
 
 
-class UserResponse(BaseModel):
+class ProfileResponse(BaseModel):
     id: Any
     name: str
     email: str
@@ -101,7 +101,7 @@ class OrderItemResponse(BaseModel):
 
 # Order Schemas
 class OrderCreate(BaseModel):
-    user_id: str
+    profile_id: str  # Changed from user_id
     restaurant_id: str
     delivery_address: str
     delivery_note: Optional[str] = None
@@ -119,7 +119,7 @@ class OrderUpdate(BaseModel):
 
 class OrderResponse(BaseModel):
     id: Any
-    user_id: Any
+    profile_id: Any  # Changed from user_id
     restaurant_id: Any
     driver_id: Optional[Any]
     status: str
@@ -138,24 +138,24 @@ class OrderResponse(BaseModel):
     class Config:
         from_attributes = True
     
-    @field_serializer('id', 'user_id', 'restaurant_id', 'driver_id')
+    @field_serializer('id', 'profile_id', 'restaurant_id', 'driver_id')
     def serialize_uuid(self, v):
         return str(v) if v else None
 
 
 # ========== Response Wrappers ==========
 
-class UserListResponse(BaseModel):
+class ProfileListResponse(BaseModel):
     success: bool = True
     message: str = "Success"
-    data: List[UserResponse]
+    data: List[ProfileResponse]
     total: int
 
 
-class UserSingleResponse(BaseModel):
+class ProfileSingleResponse(BaseModel):
     success: bool = True
     message: str = "Success"
-    data: UserResponse
+    data: ProfileResponse
 
 
 class OrderListResponse(BaseModel):

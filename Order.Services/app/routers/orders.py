@@ -17,7 +17,7 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
     """
     Tạo đơn hàng mới
     
-    - **user_id**: ID của user đặt hàng
+    - **profile_id**: ID của profile đặt hàng
     - **restaurant_id**: ID của nhà hàng
     - **items**: Danh sách món ăn
     - **delivery_address**: Địa chỉ giao hàng
@@ -115,19 +115,19 @@ def cancel_order(order_id: str, db: Session = Depends(get_db)):
     )
 
 
-# Get orders by user
-@router.get("/user/{user_id}", response_model=schemas.OrderListResponse)
-def read_user_orders(
-    user_id: str,
+# Get orders by profile
+@router.get("/profile/{profile_id}", response_model=schemas.OrderListResponse)
+def read_profile_orders(
+    profile_id: str,
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),
     db: Session = Depends(get_db)
 ):
     """
-    Lấy lịch sử mua hàng của user
+    Lấy lịch sử mua hàng của profile
     """
-    orders = crud.get_orders_by_user(db, user_id=user_id, skip=skip, limit=limit)
-    total = crud.get_orders_count_by_user(db, user_id=user_id)
+    orders = crud.get_orders_by_profile(db, profile_id=profile_id, skip=skip, limit=limit)
+    total = crud.get_orders_count_by_profile(db, profile_id=profile_id)
     
     return schemas.OrderListResponse(
         success=True,

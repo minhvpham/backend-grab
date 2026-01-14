@@ -8,8 +8,8 @@ import enum
 from .database import Base
 
 
-class UserRole(str, enum.Enum):
-    """User roles in the system"""
+class ProfileRole(str, enum.Enum):
+    """Profile roles in the system"""
     USER = "user"
     SELLER = "seller"
     SHIPPER = "shipper"
@@ -35,9 +35,9 @@ class PaymentStatus(str, enum.Enum):
     REFUNDED = "refunded"
 
 
-class User(Base):
-    """User model for database"""
-    __tablename__ = "users"
+class Profile(Base):
+    """Profile model for database - quản lý thông tin cá nhân người dùng"""
+    __tablename__ = "profiles"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String(255), nullable=False)
@@ -52,10 +52,10 @@ class User(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationship to orders
-    orders = relationship("Order", back_populates="user")
+    orders = relationship("Order", back_populates="profile")
 
     def __repr__(self):
-        return f"<User(id={self.id}, name={self.name}, email={self.email})>"
+        return f"<Profile(id={self.id}, name={self.name}, email={self.email})>"
 
 
 class Order(Base):
@@ -63,7 +63,7 @@ class Order(Base):
     __tablename__ = "orders"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
+    profile_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=False, index=True)
     restaurant_id = Column(UUID(as_uuid=True), nullable=False, index=True)  # FK to Restaurant service
     driver_id = Column(UUID(as_uuid=True), nullable=True, index=True)  # FK to Driver service
     
@@ -83,11 +83,11 @@ class Order(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
-    user = relationship("User", back_populates="orders")
+    profile = relationship("Profile", back_populates="orders")
     items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
 
     def __repr__(self):
-        return f"<Order(id={self.id}, user_id={self.user_id}, status={self.status})>"
+        return f"<Order(id={self.id}, profile_id={self.profile_id}, status={self.status})>"
 
 
 class OrderItem(Base):
