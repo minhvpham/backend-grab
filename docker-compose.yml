@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # PostgreSQL Database
@@ -30,10 +30,10 @@ services:
     environment:
       DATABASE_URL: postgresql://grab_user:grab_password@db:5432/grab_restaurant_db
     ports:
-      - "8080:8080"
+      - "8000:8080"
     volumes:
       - .:/app
-      - /app/__pycache__  
+      - /app/__pycache__
     depends_on:
       db:
         condition: service_healthy
