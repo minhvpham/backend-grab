@@ -1,3 +1,61 @@
+--
+-- PostgreSQL database dump
+--
+
+
+-- Dumped from database version 16.11 (Debian 16.11-1.pgdg13+1)
+-- Dumped by pg_dump version 18.1
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+ALTER TABLE IF EXISTS ONLY public."Transactions" DROP CONSTRAINT IF EXISTS "FK_Transactions_DriverWallets_WalletId";
+DROP INDEX IF EXISTS public."IX_TripHistories_Status";
+DROP INDEX IF EXISTS public."IX_TripHistories_OrderId";
+DROP INDEX IF EXISTS public."IX_TripHistories_DriverId";
+DROP INDEX IF EXISTS public."IX_TripHistories_DeliveredAt";
+DROP INDEX IF EXISTS public."IX_TripHistories_AssignedAt";
+DROP INDEX IF EXISTS public."IX_Transactions_WalletId";
+DROP INDEX IF EXISTS public."IX_Transactions_Type";
+DROP INDEX IF EXISTS public."IX_Transactions_OrderId";
+DROP INDEX IF EXISTS public."IX_Transactions_CreatedAt";
+DROP INDEX IF EXISTS public."IX_Drivers_VerificationStatus";
+DROP INDEX IF EXISTS public."IX_Drivers_Status";
+DROP INDEX IF EXISTS public."IX_Drivers_Email";
+DROP INDEX IF EXISTS public."IX_DriverWallets_IsActive";
+DROP INDEX IF EXISTS public."IX_DriverWallets_DriverId";
+DROP INDEX IF EXISTS public."IX_DriverLocations_Timestamp";
+DROP INDEX IF EXISTS public."IX_DriverLocations_Latitude_Longitude";
+DROP INDEX IF EXISTS public."IX_DriverLocations_DriverId";
+ALTER TABLE IF EXISTS ONLY public."__EFMigrationsHistory" DROP CONSTRAINT IF EXISTS "PK___EFMigrationsHistory";
+ALTER TABLE IF EXISTS ONLY public."TripHistories" DROP CONSTRAINT IF EXISTS "PK_TripHistories";
+ALTER TABLE IF EXISTS ONLY public."Transactions" DROP CONSTRAINT IF EXISTS "PK_Transactions";
+ALTER TABLE IF EXISTS ONLY public."Drivers" DROP CONSTRAINT IF EXISTS "PK_Drivers";
+ALTER TABLE IF EXISTS ONLY public."DriverWallets" DROP CONSTRAINT IF EXISTS "PK_DriverWallets";
+ALTER TABLE IF EXISTS ONLY public."DriverLocations" DROP CONSTRAINT IF EXISTS "PK_DriverLocations";
+DROP TABLE IF EXISTS public."__EFMigrationsHistory";
+DROP TABLE IF EXISTS public."TripHistories";
+DROP TABLE IF EXISTS public."Transactions";
+DROP TABLE IF EXISTS public."Drivers";
+DROP TABLE IF EXISTS public."DriverWallets";
+DROP TABLE IF EXISTS public."DriverLocations";
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: DriverLocations; Type: TABLE; Schema: public; Owner: -
+--
+
 CREATE TABLE public."DriverLocations" (
     "Id" uuid NOT NULL,
     "DriverId" uuid NOT NULL,
@@ -14,7 +72,12 @@ CREATE TABLE public."DriverLocations" (
     "UpdateByUserId" text,
     "UpdateByIdentityName" text
 );
-ALTER TABLE public."DriverLocations" OWNER TO postgres;
+
+
+--
+-- Name: DriverWallets; Type: TABLE; Schema: public; Owner: -
+--
+
 CREATE TABLE public."DriverWallets" (
     "Id" uuid NOT NULL,
     "DriverId" uuid NOT NULL,
@@ -31,7 +94,12 @@ CREATE TABLE public."DriverWallets" (
     "UpdateByUserId" text,
     "UpdateByIdentityName" text
 );
-ALTER TABLE public."DriverWallets" OWNER TO postgres;
+
+
+--
+-- Name: Drivers; Type: TABLE; Schema: public; Owner: -
+--
+
 CREATE TABLE public."Drivers" (
     "Id" uuid NOT NULL,
     "FullName" character varying(100) NOT NULL,
@@ -56,7 +124,12 @@ CREATE TABLE public."Drivers" (
     "UpdateByUserId" text,
     "UpdateByIdentityName" text
 );
-ALTER TABLE public."Drivers" OWNER TO postgres;
+
+
+--
+-- Name: Transactions; Type: TABLE; Schema: public; Owner: -
+--
+
 CREATE TABLE public."Transactions" (
     "Id" uuid NOT NULL,
     "Type" character varying(50) NOT NULL,
@@ -69,7 +142,12 @@ CREATE TABLE public."Transactions" (
     "CreatedAt" timestamp with time zone NOT NULL,
     "WalletId" uuid NOT NULL
 );
-ALTER TABLE public."Transactions" OWNER TO postgres;
+
+
+--
+-- Name: TripHistories; Type: TABLE; Schema: public; Owner: -
+--
+
 CREATE TABLE public."TripHistories" (
     "Id" uuid NOT NULL,
     "DriverId" uuid NOT NULL,
@@ -103,16 +181,38 @@ CREATE TABLE public."TripHistories" (
     "UpdateByUserId" text,
     "UpdateByIdentityName" text
 );
-ALTER TABLE public."TripHistories" OWNER TO postgres;
+
+
+--
+-- Name: __EFMigrationsHistory; Type: TABLE; Schema: public; Owner: -
+--
+
 CREATE TABLE public."__EFMigrationsHistory" (
     "MigrationId" character varying(150) NOT NULL,
     "ProductVersion" character varying(32) NOT NULL
 );
-ALTER TABLE public."__EFMigrationsHistory" OWNER TO postgres;
+
+
+--
+-- Data for Name: DriverLocations; Type: TABLE DATA; Schema: public; Owner: -
+--
+
 COPY public."DriverLocations" ("Id", "DriverId", "Latitude", "Longitude", "Accuracy", "Heading", "Speed", "Timestamp", "CreatedAt", "UpdatedAt", "Deleted", "DeletedAt", "UpdateByUserId", "UpdateByIdentityName") FROM stdin;
 \.
+
+
+--
+-- Data for Name: DriverWallets; Type: TABLE DATA; Schema: public; Owner: -
+--
+
 COPY public."DriverWallets" ("Id", "DriverId", "Balance", "CashOnHand", "TotalEarnings", "TotalWithdrawn", "LastWithdrawalAt", "IsActive", "CreatedAt", "UpdatedAt", "Deleted", "DeletedAt", "UpdateByUserId", "UpdateByIdentityName") FROM stdin;
 \.
+
+
+--
+-- Data for Name: Drivers; Type: TABLE DATA; Schema: public; Owner: -
+--
+
 COPY public."Drivers" ("Id", "FullName", "PhoneNumber", "Email", "Status", "VerificationStatus", "VehicleType", "LicensePlate", "VehicleBrand", "VehicleModel", "VehicleYear", "VehicleColor", "LicenseNumber", "ProfileImageUrl", "VerifiedAt", "RejectionReason", "CreatedAt", "UpdatedAt", "Deleted", "DeletedAt", "UpdateByUserId", "UpdateByIdentityName") FROM stdin;
 0853d007-3ca5-4b21-8a05-371638cd57d3	Ngo Hoang Binh	+84073639689	ngo.hoang.binh5703@email.vn	Offline	Verified	\N	\N	\N	\N	\N	\N	59118594	\N	2026-01-13 18:17:35.211837+00	\N	2026-01-13 18:17:35.211836+00	2026-01-13 18:17:35.211837+00	f	\N	\N	\N
 125c5232-99f0-43e7-bc0b-6efb83b9277a	Ngo Thanh Yen	+84086840602	ngo.thanh.yen9817@outlook.com	Offline	Pending	\N	\N	\N	\N	\N	\N	65353007	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/800.jpg	\N	\N	2026-01-13 18:17:35.211861+00	2026-01-13 18:17:35.211862+00	f	\N	\N	\N
@@ -165,41 +265,210 @@ f6130067-2a9b-4758-9de6-25438bf39f56	Luong Thi Ha	+84085998368	luong.thi.ha8246@
 f85bbd3b-0d2b-480e-848c-5fcaacfe5455	Ho Hoang Thuy	+84071840599	ho.hoang.thuy5544@yahoo.com	Offline	Pending	\N	\N	\N	\N	\N	\N	56710997	\N	\N	\N	2026-01-13 18:17:35.211785+00	2026-01-13 18:17:35.211785+00	f	\N	\N	\N
 fb105183-9e4d-4fee-9fe1-1bb1277e66f0	Pham Hoang Lan	+84056888062	pham.hoang.lan8728@outlook.com	Offline	Verified	\N	\N	\N	\N	\N	\N	\N	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/777.jpg	2026-01-13 18:17:35.211699+00	\N	2026-01-13 18:17:35.211698+00	2026-01-13 18:17:35.2117+00	f	\N	\N	\N
 \.
+
+
+--
+-- Data for Name: Transactions; Type: TABLE DATA; Schema: public; Owner: -
+--
+
 COPY public."Transactions" ("Id", "Type", "Amount", "BalanceBefore", "BalanceAfter", "OrderId", "Reference", "Description", "CreatedAt", "WalletId") FROM stdin;
 \.
+
+
+--
+-- Data for Name: TripHistories; Type: TABLE DATA; Schema: public; Owner: -
+--
+
 COPY public."TripHistories" ("Id", "DriverId", "OrderId", "Status", "PickupAddress", "PickupLatitude", "PickupLongitude", "DeliveryAddress", "DeliveryLatitude", "DeliveryLongitude", "DistanceKm", "DurationMinutes", "Fare", "CashCollected", "AssignedAt", "AcceptedAt", "PickedUpAt", "DeliveredAt", "CancelledAt", "CancellationReason", "FailureReason", "CustomerNotes", "DriverNotes", "CustomerRating", "CustomerFeedback", "CreatedAt", "UpdatedAt", "Deleted", "DeletedAt", "UpdateByUserId", "UpdateByIdentityName") FROM stdin;
 \.
+
+
+--
+-- Data for Name: __EFMigrationsHistory; Type: TABLE DATA; Schema: public; Owner: -
+--
+
 COPY public."__EFMigrationsHistory" ("MigrationId", "ProductVersion") FROM stdin;
 20260112174418_InitialCreate	8.0.11
 \.
+
+
+--
+-- Name: DriverLocations PK_DriverLocations; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY public."DriverLocations"
     ADD CONSTRAINT "PK_DriverLocations" PRIMARY KEY ("Id");
+
+
+--
+-- Name: DriverWallets PK_DriverWallets; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY public."DriverWallets"
     ADD CONSTRAINT "PK_DriverWallets" PRIMARY KEY ("Id");
+
+
+--
+-- Name: Drivers PK_Drivers; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY public."Drivers"
     ADD CONSTRAINT "PK_Drivers" PRIMARY KEY ("Id");
+
+
+--
+-- Name: Transactions PK_Transactions; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY public."Transactions"
     ADD CONSTRAINT "PK_Transactions" PRIMARY KEY ("Id");
+
+
+--
+-- Name: TripHistories PK_TripHistories; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY public."TripHistories"
     ADD CONSTRAINT "PK_TripHistories" PRIMARY KEY ("Id");
+
+
+--
+-- Name: __EFMigrationsHistory PK___EFMigrationsHistory; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY public."__EFMigrationsHistory"
     ADD CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY ("MigrationId");
+
+
+--
+-- Name: IX_DriverLocations_DriverId; Type: INDEX; Schema: public; Owner: -
+--
+
 CREATE UNIQUE INDEX "IX_DriverLocations_DriverId" ON public."DriverLocations" USING btree ("DriverId");
+
+
+--
+-- Name: IX_DriverLocations_Latitude_Longitude; Type: INDEX; Schema: public; Owner: -
+--
+
 CREATE INDEX "IX_DriverLocations_Latitude_Longitude" ON public."DriverLocations" USING btree ("Latitude", "Longitude");
+
+
+--
+-- Name: IX_DriverLocations_Timestamp; Type: INDEX; Schema: public; Owner: -
+--
+
 CREATE INDEX "IX_DriverLocations_Timestamp" ON public."DriverLocations" USING btree ("Timestamp");
+
+
+--
+-- Name: IX_DriverWallets_DriverId; Type: INDEX; Schema: public; Owner: -
+--
+
 CREATE UNIQUE INDEX "IX_DriverWallets_DriverId" ON public."DriverWallets" USING btree ("DriverId");
+
+
+--
+-- Name: IX_DriverWallets_IsActive; Type: INDEX; Schema: public; Owner: -
+--
+
 CREATE INDEX "IX_DriverWallets_IsActive" ON public."DriverWallets" USING btree ("IsActive");
+
+
+--
+-- Name: IX_Drivers_Email; Type: INDEX; Schema: public; Owner: -
+--
+
 CREATE UNIQUE INDEX "IX_Drivers_Email" ON public."Drivers" USING btree ("Email");
+
+
+--
+-- Name: IX_Drivers_Status; Type: INDEX; Schema: public; Owner: -
+--
+
 CREATE INDEX "IX_Drivers_Status" ON public."Drivers" USING btree ("Status");
+
+
+--
+-- Name: IX_Drivers_VerificationStatus; Type: INDEX; Schema: public; Owner: -
+--
+
 CREATE INDEX "IX_Drivers_VerificationStatus" ON public."Drivers" USING btree ("VerificationStatus");
+
+
+--
+-- Name: IX_Transactions_CreatedAt; Type: INDEX; Schema: public; Owner: -
+--
+
 CREATE INDEX "IX_Transactions_CreatedAt" ON public."Transactions" USING btree ("CreatedAt");
+
+
+--
+-- Name: IX_Transactions_OrderId; Type: INDEX; Schema: public; Owner: -
+--
+
 CREATE INDEX "IX_Transactions_OrderId" ON public."Transactions" USING btree ("OrderId");
+
+
+--
+-- Name: IX_Transactions_Type; Type: INDEX; Schema: public; Owner: -
+--
+
 CREATE INDEX "IX_Transactions_Type" ON public."Transactions" USING btree ("Type");
+
+
+--
+-- Name: IX_Transactions_WalletId; Type: INDEX; Schema: public; Owner: -
+--
+
 CREATE INDEX "IX_Transactions_WalletId" ON public."Transactions" USING btree ("WalletId");
+
+
+--
+-- Name: IX_TripHistories_AssignedAt; Type: INDEX; Schema: public; Owner: -
+--
+
 CREATE INDEX "IX_TripHistories_AssignedAt" ON public."TripHistories" USING btree ("AssignedAt");
+
+
+--
+-- Name: IX_TripHistories_DeliveredAt; Type: INDEX; Schema: public; Owner: -
+--
+
 CREATE INDEX "IX_TripHistories_DeliveredAt" ON public."TripHistories" USING btree ("DeliveredAt");
+
+
+--
+-- Name: IX_TripHistories_DriverId; Type: INDEX; Schema: public; Owner: -
+--
+
 CREATE INDEX "IX_TripHistories_DriverId" ON public."TripHistories" USING btree ("DriverId");
+
+
+--
+-- Name: IX_TripHistories_OrderId; Type: INDEX; Schema: public; Owner: -
+--
+
 CREATE UNIQUE INDEX "IX_TripHistories_OrderId" ON public."TripHistories" USING btree ("OrderId");
+
+
+--
+-- Name: IX_TripHistories_Status; Type: INDEX; Schema: public; Owner: -
+--
+
 CREATE INDEX "IX_TripHistories_Status" ON public."TripHistories" USING btree ("Status");
+
+
+--
+-- Name: Transactions FK_Transactions_DriverWallets_WalletId; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY public."Transactions"
     ADD CONSTRAINT "FK_Transactions_DriverWallets_WalletId" FOREIGN KEY ("WalletId") REFERENCES public."DriverWallets"("Id") ON DELETE CASCADE;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+
