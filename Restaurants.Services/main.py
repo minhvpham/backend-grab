@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.api import api_router
 from app.db.base import Base, engine
+from fastapi.middleware.cors import CORSMiddleware
 
 # Create database tables
 # Note: In production, use Alembic migrations instead
@@ -11,6 +12,18 @@ app = FastAPI(
     description="API for managing restaurants in the Grab-like food delivery system",
     version="1.0.0"
 )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",   # React / Next.js local
+        "http://localhost:5173",   # Vite
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # Include API routes
 app.include_router(api_router, prefix="/api/v1")

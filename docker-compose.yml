@@ -72,6 +72,7 @@ services:
     container_name: united-auth-service-api
     environment:
       - DATABASE_URL=postgresql://postgres:united_password@postgres:5432/auth_services
+      - SECRET_KEY=SECRET_KEY_CHANGE_ME
     ports:
       - "8003:8000"
     depends_on:
