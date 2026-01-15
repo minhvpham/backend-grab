@@ -24,13 +24,13 @@ class Restaurant(Base):
     address = Column(Text, nullable=False)
     phone = Column(String(20), nullable=True)
     
-    # Coordinates for maps 
-    latitude = Column(Numeric(10, 8), nullable=True)
-    longitude = Column(Numeric(11, 8), nullable=True)
-    
     opening_hours = Column(String(100), nullable=True)
     is_open = Column(Boolean, default=True)
     rating = Column(Numeric(2, 1), default=0.0)
+    
+    # Document images for approval
+    business_license_image = Column(String(255), nullable=True)
+    food_safety_certificate_image = Column(String(255), nullable=True)
     
     # Status for admin approval 
     status = Column(Enum(RestaurantStatus), default=RestaurantStatus.PENDING)

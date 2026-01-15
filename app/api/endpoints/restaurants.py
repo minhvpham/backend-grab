@@ -1,30 +1,66 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.db.base import get_db
 from app.schemas.restaurant import RestaurantCreate, RestaurantUpdate, RestaurantResponse
 from app.crud import restaurant as crud
 from app.models.restaurant import RestaurantStatus
+from app.utils import save_business_license, save_food_safety_certificate, ensure_upload_directories
 
 router = APIRouter()
 
+# Ensure upload directories exist on startup
+ensure_upload_directories()
+
 
 @router.post("/", response_model=RestaurantResponse, status_code=status.HTTP_201_CREATED)
-def create_restaurant(
-    restaurant: RestaurantCreate, 
+async def create_restaurant(
+    owner_id: int = Form(...),
+    name: str = Form(...),
+    address: str = Form(...),
+    phone: Optional[str] = Form(None),
+    description: Optional[str] = Form(None),
+    opening_hours: Optional[str] = Form(None),
+    business_license_image: UploadFile = File(...),
+    food_safety_certificate_image: UploadFile = File(...),
     db: Session = Depends(get_db),
-    # TODO: Add authentication
-    # current_user: User = Depends(get_current_user)
 ):
     """
-    Create a new restaurant.
+    Create a new restaurant with document images.
     
-    **Note:** In production, owner_id should come from the authenticated user.
-    For now, it's hardcoded to 1 for testing purposes.
+    This endpoint accepts multipart/form-data with:
+    - owner_id: User ID of the restaurant owner
+    - Restaurant details as form fields
+    - Two image files (business license and food safety certificate)
     """
-    # TODO: Replace hardcoded owner_id with current_user.id
-    owner_id = 1  # TEMPORARY - Replace with authenticated user's ID
-    return crud.create_restaurant(db, restaurant, owner_id=owner_id)
+    try:
+        # Save uploaded images
+        business_license_path = await save_business_license(business_license_image)
+        food_safety_cert_path = await save_food_safety_certificate(food_safety_certificate_image)
+        
+        # Create restaurant data
+        restaurant_data = RestaurantCreate(
+            name=name,
+            description=description,
+            address=address,
+            phone=phone,
+            opening_hours=opening_hours,
+            business_license_image=business_license_path,
+            food_safety_certificate_image=food_safety_cert_path
+        )
+        
+        return crud.create_restaurant(db, restaurant_data, owner_id=owner_id)
+        
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error creating restaurant: {str(e)}"
+        )
 
 
 @router.get("/", response_model=List[RestaurantResponse])

@@ -10,9 +10,9 @@ class RestaurantBase(BaseModel):
     description: Optional[str] = None
     address: str
     phone: Optional[str] = None
-    latitude: Optional[Decimal] = None
-    longitude: Optional[Decimal] = None
     opening_hours: Optional[str] = None
+    business_license_image: Optional[str] = None
+    food_safety_certificate_image: Optional[str] = None
 
 
 class RestaurantCreate(RestaurantBase):
@@ -24,10 +24,10 @@ class RestaurantUpdate(BaseModel):
     address: Optional[str] = None
     phone: Optional[str] = None
     description: Optional[str] = None
-    latitude: Optional[Decimal] = None
-    longitude: Optional[Decimal] = None
     is_open: Optional[bool] = None
     opening_hours: Optional[str] = None
+    business_license_image: Optional[str] = None
+    food_safety_certificate_image: Optional[str] = None
     # Only Admin should update status
 
 
