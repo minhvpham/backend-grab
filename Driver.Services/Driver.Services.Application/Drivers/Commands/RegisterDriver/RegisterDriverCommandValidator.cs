@@ -24,6 +24,6 @@ public class RegisterDriverCommandValidator : AbstractValidator<RegisterDriverCo
             .MaximumLength(50).WithMessage("License number must not exceed 50 characters");
 
         RuleFor(x => x.DriverId)
-            .Must(id => id == null || id != Guid.Empty).WithMessage("Driver ID cannot be empty GUID");
+            .Must(id => id == null || Guid.TryParse(id, out _)).WithMessage("Driver ID must be a valid GUID string");
     }
 }

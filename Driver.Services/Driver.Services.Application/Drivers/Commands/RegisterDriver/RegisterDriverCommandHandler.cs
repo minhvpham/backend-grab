@@ -21,13 +21,21 @@ public class RegisterDriverCommandHandler : IRequestHandler<RegisterDriverComman
         CancellationToken cancellationToken)
     {
         // Check if provided driver ID already exists
-        if (request.DriverId.HasValue)
+        Guid? driverId = null;
+        if (!string.IsNullOrEmpty(request.DriverId))
         {
-            var existingDriverById = await _driverRepository.GetByIdAsync(request.DriverId.Value, cancellationToken);
+            if (!Guid.TryParse(request.DriverId, out var parsedId))
+            {
+                return Result.Failure<DriverDto>(
+                    Error.Validation("Driver.InvalidId", "Driver ID must be a valid GUID"));
+            }
+            driverId = parsedId;
+
+            var existingDriverById = await _driverRepository.GetByIdAsync(parsedId, cancellationToken);
             if (existingDriverById is not null)
             {
                 return Result.Failure<DriverDto>(
-                    Error.Conflict("Driver.IdExists", $"Driver with ID '{request.DriverId.Value}' already exists"));
+                    Error.Conflict("Driver.IdExists", $"Driver with ID '{parsedId}' already exists"));
             }
         }
 
@@ -55,7 +63,7 @@ public class RegisterDriverCommandHandler : IRequestHandler<RegisterDriverComman
                 request.PhoneNumber,
                 request.Email,
                 request.LicenseNumber,
-                request.DriverId);
+                driverId);
 
             _driverRepository.Add(driver);
 

@@ -9,4 +9,4 @@ public record RegisterDriverCommand(
     string PhoneNumber,
     string Email,
     string LicenseNumber,
-    Guid? DriverId = null) : IRequest<Result<DriverDto>>;
+    string? DriverId = null) : IRequest<Result<DriverDto>>;
