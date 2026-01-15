@@ -86,7 +86,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:united_password@postgres:5432/restaurants_services
     ports:
-      - "8000:8080"
+      - "8004:8080"
     depends_on:
       postgres:
         condition: service_healthy
