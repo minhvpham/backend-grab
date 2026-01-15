@@ -33,11 +33,11 @@ public class DriversController : ControllerBase
     public async Task<IActionResult> RegisterDriver([FromBody] RegisterDriverCommand command, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
-        
+
         if (result.IsFailure)
             return BadRequest(new { error = result.Error.Message });
 
-        return CreatedAtAction(nameof(GetDriverById), new { id = result.Value }, result.Value);
+        return CreatedAtAction(nameof(GetDriverById), new { id = result.Value.Id }, result.Value);
     }
 
     /// <summary>

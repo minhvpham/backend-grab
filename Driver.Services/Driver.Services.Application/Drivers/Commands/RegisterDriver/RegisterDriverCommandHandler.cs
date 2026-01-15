@@ -20,6 +20,17 @@ public class RegisterDriverCommandHandler : IRequestHandler<RegisterDriverComman
         RegisterDriverCommand request,
         CancellationToken cancellationToken)
     {
+        // Check if provided driver ID already exists
+        if (request.DriverId.HasValue)
+        {
+            var existingDriverById = await _driverRepository.GetByIdAsync(request.DriverId.Value, cancellationToken);
+            if (existingDriverById is not null)
+            {
+                return Result.Failure<DriverDto>(
+                    Error.Conflict("Driver.IdExists", $"Driver with ID '{request.DriverId.Value}' already exists"));
+            }
+        }
+
         // Check if driver with same email already exists
         var existingDriverByEmail = await _driverRepository.GetByEmailAsync(request.Email, cancellationToken);
         if (existingDriverByEmail is not null)
@@ -43,7 +54,8 @@ public class RegisterDriverCommandHandler : IRequestHandler<RegisterDriverComman
                 request.FullName,
                 request.PhoneNumber,
                 request.Email,
-                request.LicenseNumber);
+                request.LicenseNumber,
+                request.DriverId);
 
             _driverRepository.Add(driver);
 

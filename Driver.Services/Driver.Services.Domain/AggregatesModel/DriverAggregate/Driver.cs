@@ -24,11 +24,12 @@ public class Driver : Entity<Guid>, IAggregateRoot
         string fullName,
         string phoneNumber,
         string email,
-        string? licenseNumber = null)
+        string? licenseNumber = null,
+        Guid? id = null)
     {
         var driver = new Driver
         {
-            Id = Guid.NewGuid(),
+            Id = id ?? Guid.NewGuid(),
             FullName = ValidateFullName(fullName),
             PhoneNumber = new PhoneNumber(phoneNumber),
             Email = ValidateEmail(email),
