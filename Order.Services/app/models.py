@@ -39,8 +39,7 @@ class Profile(Base):
     """Profile model for database - quản lý thông tin cá nhân người dùng"""
     __tablename__ = "profiles"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(String(255), unique=True, nullable=False, index=True)  # ID từ Auth Service
+    user_id = Column(String(255), primary_key=True)  # ID từ Auth Service (Primary Key)
     name = Column(String(255), nullable=False)
     email = Column(String(255), unique=True, nullable=False, index=True)
     phone = Column(String(20), unique=True, nullable=False, index=True)
@@ -56,7 +55,7 @@ class Profile(Base):
     orders = relationship("Order", back_populates="profile")
 
     def __repr__(self):
-        return f"<Profile(id={self.id}, name={self.name}, email={self.email})>"
+        return f"<Profile(user_id={self.user_id}, name={self.name}, email={self.email})>"
 
 
 class Order(Base):
@@ -64,7 +63,7 @@ class Order(Base):
     __tablename__ = "orders"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    profile_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id"), nullable=False, index=True)
+    user_id = Column(String(255), ForeignKey("profiles.user_id"), nullable=False, index=True)  # FK to Profile
     restaurant_id = Column(UUID(as_uuid=True), nullable=False, index=True)  # FK to Restaurant service
     driver_id = Column(UUID(as_uuid=True), nullable=True, index=True)  # FK to Driver service
     

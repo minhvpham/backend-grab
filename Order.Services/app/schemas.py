@@ -36,8 +36,7 @@ class ProfileUpdate(BaseModel):
 
 
 class ProfileResponse(BaseModel):
-    id: Any
-    user_id: str  # ID từ Auth Service
+    user_id: str  # ID từ Auth Service (Primary Key)
     name: str
     email: str
     phone: str
@@ -49,10 +48,6 @@ class ProfileResponse(BaseModel):
 
     class Config:
         from_attributes = True
-    
-    @field_serializer('id')
-    def serialize_id(self, v):
-        return str(v) if v else None
 
 
 # ========== Order Enums & Schemas ==========
@@ -102,7 +97,7 @@ class OrderItemResponse(BaseModel):
 
 # Order Schemas
 class OrderCreate(BaseModel):
-    profile_id: str  # Changed from user_id
+    user_id: str  # ID từ Auth Service
     restaurant_id: str
     delivery_address: str
     delivery_note: Optional[str] = None
@@ -120,7 +115,7 @@ class OrderUpdate(BaseModel):
 
 class OrderResponse(BaseModel):
     id: Any
-    profile_id: Any  # Changed from user_id
+    user_id: str  # ID từ Auth Service
     restaurant_id: Any
     driver_id: Optional[Any]
     status: str
@@ -139,7 +134,7 @@ class OrderResponse(BaseModel):
     class Config:
         from_attributes = True
     
-    @field_serializer('id', 'profile_id', 'restaurant_id', 'driver_id')
+    @field_serializer('id', 'restaurant_id', 'driver_id')
     def serialize_uuid(self, v):
         return str(v) if v else None
 
