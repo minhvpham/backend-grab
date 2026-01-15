@@ -11,3 +11,9 @@ CREATE DATABASE auth_services;
 
 -- Grant permissions
 GRANT ALL PRIVILEGES ON DATABASE auth_services TO postgres;
+
+-- Create restaurants_services database
+CREATE DATABASE restaurants_services;
+
+-- Grant permissions
+GRANT ALL PRIVILEGES ON DATABASE restaurants_services TO postgres;
