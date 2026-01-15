@@ -32,9 +32,13 @@ def create_profile(profile: schemas.ProfileCreate, db: Session = Depends(get_db)
     existing = db.query(Profile).filter(Profile.phone == profile.phone).first()
     if existing:
         raise HTTPException(status_code=400, detail="Số điện thoại đã tồn tại")
+    # Check user_id exists
+    existing = db.query(Profile).filter(Profile.user_id == profile.user_id).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="User ID đã tồn tại")
     
     db_profile = Profile(
-        id=uuid.UUID(profile.id),
+        user_id=profile.user_id,
         name=profile.name,
         email=profile.email,
         phone=profile.phone,
@@ -74,8 +78,22 @@ def read_profiles(
 
 @router.get("/{profile_id}", response_model=schemas.ProfileSingleResponse)
 def read_profile(profile_id: str, db: Session = Depends(get_db)):
-    """Lấy thông tin profile"""
+    """Lấy thông tin profile theo profile ID (UUID)"""
     db_profile = db.query(Profile).filter(Profile.id == uuid.UUID(profile_id)).first()
+    if not db_profile:
+        raise HTTPException(status_code=404, detail="Profile không tồn tại")
+    
+    return schemas.ProfileSingleResponse(
+        success=True,
+        message="Lấy thông tin profile thành công",
+        data=db_profile
+    )
+
+
+@router.get("/user/{user_id}", response_model=schemas.ProfileSingleResponse)
+def read_profile_by_user_id(user_id: str, db: Session = Depends(get_db)):
+    """Lấy thông tin profile theo user_id (từ Auth Service)"""
+    db_profile = db.query(Profile).filter(Profile.user_id == user_id).first()
     if not db_profile:
         raise HTTPException(status_code=404, detail="Profile không tồn tại")
     

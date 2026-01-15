@@ -16,7 +16,7 @@ class ProfileRole(str, Enum):
 
 
 class ProfileCreate(BaseModel):
-    id: str = Field(..., description="ID từ Auth Service")
+    user_id: str = Field(..., description="ID từ Auth Service")
     name: str = Field(..., min_length=1, max_length=255)
     email: EmailStr
     phone: str = Field(..., min_length=10, max_length=20)
@@ -37,6 +37,7 @@ class ProfileUpdate(BaseModel):
 
 class ProfileResponse(BaseModel):
     id: Any
+    user_id: str  # ID từ Auth Service
     name: str
     email: str
     phone: str
