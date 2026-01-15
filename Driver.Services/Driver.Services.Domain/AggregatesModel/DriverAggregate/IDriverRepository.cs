@@ -4,7 +4,7 @@ namespace Driver.Services.Domain.AggregatesModel.DriverAggregate;
 
 public interface IDriverRepository : IRepository<Driver>
 {
-    Task<Driver?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<Driver?> GetByIdAsync(string id, CancellationToken cancellationToken = default);
     Task<Driver?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
     Task<Driver?> GetByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken = default);
     Task<IEnumerable<Driver>> GetOnlineDriversAsync(CancellationToken cancellationToken = default);

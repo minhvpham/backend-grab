@@ -24,7 +24,7 @@ public class DriverLocationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateLocation(Guid driverId, [FromBody] UpdateLocationRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateLocation(string driverId, [FromBody] UpdateLocationRequest request, CancellationToken cancellationToken)
     {
         var command = new UpdateDriverLocationCommand(driverId, request.Latitude, request.Longitude);
         var result = await _mediator.Send(command, cancellationToken);
@@ -43,7 +43,7 @@ public class DriverLocationsController : ControllerBase
     [HttpGet("{driverId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetLocation(Guid driverId, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetLocation(string driverId, CancellationToken cancellationToken)
     {
         var query = new GetDriverLocationQuery(driverId);
         var result = await _mediator.Send(query, cancellationToken);

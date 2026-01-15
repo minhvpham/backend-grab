@@ -18,7 +18,7 @@ public class DriverLocationRepository : IDriverLocationRepository
     }
 
     public async Task<DriverLocation?> GetByIdAsync(
-        Guid id,
+        string id,
         CancellationToken cancellationToken = default)
     {
         return await _context.DriverLocations
@@ -26,7 +26,7 @@ public class DriverLocationRepository : IDriverLocationRepository
     }
 
     public async Task<DriverLocation?> GetLatestByDriverIdAsync(
-        Guid driverId,
+        string driverId,
         CancellationToken cancellationToken = default)
     {
         return await _context.DriverLocations
@@ -36,7 +36,7 @@ public class DriverLocationRepository : IDriverLocationRepository
     }
 
     public async Task<IEnumerable<DriverLocation>> GetLocationHistoryAsync(
-        Guid driverId,
+        string driverId,
         DateTimeOffset since,
         CancellationToken cancellationToken = default)
     {

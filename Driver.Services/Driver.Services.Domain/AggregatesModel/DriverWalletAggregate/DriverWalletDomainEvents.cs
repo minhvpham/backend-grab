@@ -4,8 +4,8 @@ namespace Driver.Services.Domain.AggregatesModel.DriverWalletAggregate;
 
 // Base wallet balance changed event
 public record WalletBalanceChangedDomainEvent(
-    Guid WalletId,
-    Guid DriverId,
+    string WalletId,
+    string DriverId,
     decimal NewBalance,
     TransactionType TransactionType,
     decimal Amount) : IDomainEvent
@@ -15,8 +15,8 @@ public record WalletBalanceChangedDomainEvent(
 
 // Cash collected from order
 public record WalletCashCollectedDomainEvent(
-    Guid WalletId,
-    Guid DriverId,
+    string WalletId,
+    string DriverId,
     decimal Amount,
     string OrderId) : IDomainEvent
 {
@@ -25,8 +25,8 @@ public record WalletCashCollectedDomainEvent(
 
 // Cash returned to balance
 public record WalletCashReturnedDomainEvent(
-    Guid WalletId,
-    Guid DriverId,
+    string WalletId,
+    string DriverId,
     decimal Amount,
     decimal NewBalance,
     string? Reference) : IDomainEvent

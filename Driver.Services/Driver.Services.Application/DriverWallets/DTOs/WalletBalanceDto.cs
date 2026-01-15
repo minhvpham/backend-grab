@@ -2,8 +2,8 @@ namespace Driver.Services.Application.DriverWallets.DTOs;
 
 public class WalletBalanceDto
 {
-    public Guid WalletId { get; set; }
-    public Guid DriverId { get; set; }
+    public string WalletId { get; set; } = string.Empty;
+    public string DriverId { get; set; } = string.Empty;
     public decimal Balance { get; set; }
     public decimal CashOnHand { get; set; }
     public decimal TotalEarnings { get; set; }

@@ -3,7 +3,7 @@ using Driver.Services.Domain.Exceptions;
 
 namespace Driver.Services.Domain.AggregatesModel.DriverAggregate;
 
-public class Driver : Entity<Guid>, IAggregateRoot
+public class Driver : Entity<string>, IAggregateRoot
 {
     public string FullName { get; private set; }
     public PhoneNumber PhoneNumber { get; private set; }
@@ -25,11 +25,11 @@ public class Driver : Entity<Guid>, IAggregateRoot
         string phoneNumber,
         string email,
         string? licenseNumber = null,
-        Guid? id = null)
+        string? id = null)
     {
         var driver = new Driver
         {
-            Id = id ?? Guid.NewGuid(),
+            Id = id ?? Guid.NewGuid().ToString(),
             FullName = ValidateFullName(fullName),
             PhoneNumber = new PhoneNumber(phoneNumber),
             Email = ValidateEmail(email),

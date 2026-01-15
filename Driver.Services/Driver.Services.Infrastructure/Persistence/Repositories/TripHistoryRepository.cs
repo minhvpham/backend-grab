@@ -18,7 +18,7 @@ public class TripHistoryRepository : ITripHistoryRepository
     }
 
     public async Task<TripHistory?> GetByIdAsync(
-        Guid id,
+        string id,
         CancellationToken cancellationToken = default)
     {
         return await _context.TripHistories
@@ -34,7 +34,7 @@ public class TripHistoryRepository : ITripHistoryRepository
     }
 
     public async Task<IReadOnlyList<TripHistory>> GetByDriverIdAsync(
-        Guid driverId,
+        string driverId, 
         CancellationToken cancellationToken = default)
     {
         return await _context.TripHistories
@@ -44,7 +44,7 @@ public class TripHistoryRepository : ITripHistoryRepository
     }
 
     public async Task<IReadOnlyList<TripHistory>> GetActiveTripsAsync(
-        Guid driverId,
+        string driverId,
         CancellationToken cancellationToken = default)
     {
         return await _context.TripHistories
@@ -57,7 +57,7 @@ public class TripHistoryRepository : ITripHistoryRepository
     }
 
     public async Task<IReadOnlyList<TripHistory>> GetCompletedTripsAsync(
-        Guid driverId,
+        string driverId,
         DateTime? from = null,
         DateTime? to = null,
         CancellationToken cancellationToken = default)
@@ -87,7 +87,7 @@ public class TripHistoryRepository : ITripHistoryRepository
     }
 
     public async Task<int> GetTotalTripsCountAsync(
-        Guid driverId,
+        string driverId,
         CancellationToken cancellationToken = default)
     {
         return await _context.TripHistories
@@ -95,7 +95,7 @@ public class TripHistoryRepository : ITripHistoryRepository
     }
 
     public async Task<decimal> GetTotalEarningsAsync(
-        Guid driverId,
+        string driverId,
         DateTime? from = null,
         DateTime? to = null,
         CancellationToken cancellationToken = default)

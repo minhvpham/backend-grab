@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Driver.Services.Application.DriverLocations.Queries.GetDriverLocation;
 
-public record GetDriverLocationQuery(Guid DriverId) : IRequest<Result<DriverLocationDto>>;
+public record GetDriverLocationQuery(string DriverId) : IRequest<Result<DriverLocationDto>>;

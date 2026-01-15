@@ -4,7 +4,7 @@ namespace Driver.Services.Application.Drivers.DTOs;
 
 public record DriverDto
 {
-    public Guid Id { get; init; }
+    public string Id { get; init; } = string.Empty;
     public string FullName { get; init; } = string.Empty;
     public string PhoneNumber { get; init; } = string.Empty;
     public string Email { get; init; } = string.Empty;
@@ -31,7 +31,7 @@ public record VehicleInfoDto
 
 public record DriverSummaryDto
 {
-    public Guid Id { get; init; }
+    public string Id { get; init; } = string.Empty;
     public string FullName { get; init; } = string.Empty;
     public string PhoneNumber { get; init; } = string.Empty;
     public string Status { get; init; } = string.Empty;

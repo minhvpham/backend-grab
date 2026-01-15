@@ -4,12 +4,12 @@ namespace Driver.Services.Domain.AggregatesModel.DriverAggregate;
 
 public class DriverRegisteredDomainEvent : IDomainEvent
 {
-    public Guid DriverId { get; }
+    public string DriverId { get; }
     public string FullName { get; }
     public string Email { get; }
     public DateTimeOffset OccurredOn { get; }
 
-    public DriverRegisteredDomainEvent(Guid driverId, string fullName, string email)
+    public DriverRegisteredDomainEvent(string driverId, string fullName, string email)
     {
         DriverId = driverId;
         FullName = fullName;
@@ -20,11 +20,11 @@ public class DriverRegisteredDomainEvent : IDomainEvent
 
 public class DriverVerifiedDomainEvent : IDomainEvent
 {
-    public Guid DriverId { get; }
+    public string DriverId { get; }
     public string FullName { get; }
     public DateTimeOffset OccurredOn { get; }
 
-    public DriverVerifiedDomainEvent(Guid driverId, string fullName)
+    public DriverVerifiedDomainEvent(string driverId, string fullName)
     {
         DriverId = driverId;
         FullName = fullName;
@@ -34,12 +34,12 @@ public class DriverVerifiedDomainEvent : IDomainEvent
 
 public class DriverRejectedDomainEvent : IDomainEvent
 {
-    public Guid DriverId { get; }
+    public string DriverId { get; }
     public string FullName { get; }
     public string Reason { get; }
     public DateTimeOffset OccurredOn { get; }
 
-    public DriverRejectedDomainEvent(Guid driverId, string fullName, string reason)
+    public DriverRejectedDomainEvent(string driverId, string fullName, string reason)
     {
         DriverId = driverId;
         FullName = fullName;
@@ -50,12 +50,12 @@ public class DriverRejectedDomainEvent : IDomainEvent
 
 public class DriverVehicleUpdatedDomainEvent : IDomainEvent
 {
-    public Guid DriverId { get; }
+    public string DriverId { get; }
     public string VehicleType { get; }
     public string LicensePlate { get; }
     public DateTimeOffset OccurredOn { get; }
 
-    public DriverVehicleUpdatedDomainEvent(Guid driverId, string vehicleType, string licensePlate)
+    public DriverVehicleUpdatedDomainEvent(string driverId, string vehicleType, string licensePlate)
     {
         DriverId = driverId;
         VehicleType = vehicleType;
@@ -66,11 +66,11 @@ public class DriverVehicleUpdatedDomainEvent : IDomainEvent
 
 public class DriverDeletedDomainEvent : IDomainEvent
 {
-    public Guid DriverId { get; }
+    public string DriverId { get; }
     public string FullName { get; }
     public DateTimeOffset OccurredOn { get; }
 
-    public DriverDeletedDomainEvent(Guid driverId, string fullName)
+    public DriverDeletedDomainEvent(string driverId, string fullName)
     {
         DriverId = driverId;
         FullName = fullName;

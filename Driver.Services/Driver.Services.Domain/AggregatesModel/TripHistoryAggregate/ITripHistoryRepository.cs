@@ -4,16 +4,16 @@ namespace Driver.Services.Domain.AggregatesModel.TripHistoryAggregate;
 
 public interface ITripHistoryRepository : IRepository<TripHistory>
 {
-    Task<TripHistory?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<TripHistory?> GetByIdAsync(string id, CancellationToken cancellationToken = default);
     Task<TripHistory?> GetByOrderIdAsync(string orderId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<TripHistory>> GetByDriverIdAsync(
-        Guid driverId, 
+        string driverId, 
         CancellationToken cancellationToken = default);
     Task<IReadOnlyList<TripHistory>> GetActiveTripsAsync(
-        Guid driverId,
+        string driverId,
         CancellationToken cancellationToken = default);
     Task<IReadOnlyList<TripHistory>> GetCompletedTripsAsync(
-        Guid driverId,
+        string driverId,
         DateTime? from = null,
         DateTime? to = null,
         CancellationToken cancellationToken = default);
@@ -21,10 +21,10 @@ public interface ITripHistoryRepository : IRepository<TripHistory>
         TripStatus status,
         CancellationToken cancellationToken = default);
     Task<int> GetTotalTripsCountAsync(
-        Guid driverId,
+        string driverId,
         CancellationToken cancellationToken = default);
     Task<decimal> GetTotalEarningsAsync(
-        Guid driverId,
+        string driverId,
         DateTime? from = null,
         DateTime? to = null,
         CancellationToken cancellationToken = default);

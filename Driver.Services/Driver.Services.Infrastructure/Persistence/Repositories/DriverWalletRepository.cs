@@ -18,7 +18,7 @@ public class DriverWalletRepository : IDriverWalletRepository
     }
 
     public async Task<DriverWallet?> GetByIdAsync(
-        Guid id,
+        string id,
         CancellationToken cancellationToken = default)
     {
         return await _context.DriverWallets
@@ -26,7 +26,7 @@ public class DriverWalletRepository : IDriverWalletRepository
     }
 
     public async Task<DriverWallet?> GetByDriverIdAsync(
-        Guid driverId,
+        string driverId,
         CancellationToken cancellationToken = default)
     {
         return await _context.DriverWallets

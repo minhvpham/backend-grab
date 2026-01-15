@@ -3,9 +3,9 @@ using Driver.Services.Domain.Exceptions;
 
 namespace Driver.Services.Domain.AggregatesModel.DriverWalletAggregate;
 
-public class DriverWallet : Entity<Guid>, IAggregateRoot
+public class DriverWallet : Entity<string>, IAggregateRoot
 {
-    public Guid DriverId { get; private set; }
+    public string DriverId { get; private set; } = string.Empty;
     public decimal Balance { get; private set; }
     public decimal CashOnHand { get; private set; } // COD amount driver collected but not settled
     public decimal TotalEarnings { get; private set; }
@@ -18,11 +18,11 @@ public class DriverWallet : Entity<Guid>, IAggregateRoot
 
     private DriverWallet() { } // For EF Core
 
-    public static DriverWallet Create(Guid driverId)
+    public static DriverWallet Create(string driverId)
     {
         var wallet = new DriverWallet
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.NewGuid().ToString(),
             DriverId = driverId,
             Balance = 0,
             CashOnHand = 0,

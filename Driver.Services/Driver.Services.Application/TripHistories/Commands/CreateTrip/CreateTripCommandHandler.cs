@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Driver.Services.Application.TripHistories.Commands.CreateTrip;
 
-public class CreateTripCommandHandler : IRequestHandler<CreateTripCommand, Result<Guid>>
+public class CreateTripCommandHandler : IRequestHandler<CreateTripCommand, Result<string>>
 {
     private readonly IDriverRepository _driverRepository;
     private readonly ITripHistoryRepository _tripRepository;
@@ -22,13 +22,13 @@ public class CreateTripCommandHandler : IRequestHandler<CreateTripCommand, Resul
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<Guid>> Handle(CreateTripCommand request, CancellationToken cancellationToken)
+    public async Task<Result<string>> Handle(CreateTripCommand request, CancellationToken cancellationToken)
     {
         // Verify driver exists
         var driver = await _driverRepository.GetByIdAsync(request.DriverId, cancellationToken);
         if (driver == null)
         {
-            return Result.Failure<Guid>(
+            return Result.Failure<string>(
                 Error.NotFound("Driver.NotFound", $"Driver with ID '{request.DriverId}' not found."));
         }
 
@@ -36,8 +36,8 @@ public class CreateTripCommandHandler : IRequestHandler<CreateTripCommand, Resul
         var existingTrip = await _tripRepository.GetByOrderIdAsync(request.OrderId, cancellationToken);
         if (existingTrip != null)
         {
-            return Result.Failure<Guid>(
-                Error.Conflict("Trip.AlreadyExists", $"Trip for order '{request.OrderId}' already exists."));
+            return Result.Failure<string>(
+                Error.Conflict("Trip.OrderExists", $"Order '{request.OrderId}' already has a trip."));
         }
 
         try
@@ -61,7 +61,7 @@ public class CreateTripCommandHandler : IRequestHandler<CreateTripCommand, Resul
         }
         catch (Exception ex)
         {
-            return Result.Failure<Guid>(
+            return Result.Failure<string>(
                 Error.Validation("Trip.CreateFailed", ex.Message));
         }
     }

@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Driver.Services.Application.TripHistories.Queries.GetTripById;
 
-public record GetTripByIdQuery(Guid TripId) : IRequest<Result<TripHistoryDto>>;
+public record GetTripByIdQuery(string TripId) : IRequest<Result<TripHistoryDto>>;

@@ -28,7 +28,7 @@ public class DriversController : ControllerBase
     /// Register a new driver
     /// </summary>
     [HttpPost]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> RegisterDriver([FromBody] RegisterDriverCommand command, CancellationToken cancellationToken)
     {
@@ -46,7 +46,7 @@ public class DriversController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetDriverById(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetDriverById(string id, CancellationToken cancellationToken)
     {
         var query = new GetDriverByIdQuery(id);
         var result = await _mediator.Send(query, cancellationToken);
@@ -86,7 +86,7 @@ public class DriversController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateProfile(Guid id, [FromBody] UpdateDriverProfileRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateProfile(string id, [FromBody] UpdateDriverProfileRequest request, CancellationToken cancellationToken)
     {
         var command = new UpdateDriverProfileCommand(
             id,
@@ -111,7 +111,7 @@ public class DriversController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateVehicle(Guid id, [FromBody] UpdateVehicleInfoRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateVehicle(string id, [FromBody] UpdateVehicleInfoRequest request, CancellationToken cancellationToken)
     {
         var command = new UpdateVehicleInfoCommand(
             id,
@@ -138,7 +138,7 @@ public class DriversController : ControllerBase
     [HttpPost("{id}/verify")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> VerifyDriver(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> VerifyDriver(string id, CancellationToken cancellationToken)
     {
         var command = new VerifyDriverCommand(id);
         var result = await _mediator.Send(command, cancellationToken);
@@ -156,7 +156,7 @@ public class DriversController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> RejectDriver(Guid id, [FromBody] RejectDriverRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> RejectDriver(string id, [FromBody] RejectDriverRequest request, CancellationToken cancellationToken)
     {
         var command = new RejectDriverCommand(id, request.Reason);
         var result = await _mediator.Send(command, cancellationToken);
@@ -176,7 +176,7 @@ public class DriversController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ChangeStatus(Guid id, [FromBody] ChangeStatusRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> ChangeStatus(string id, [FromBody] ChangeStatusRequest request, CancellationToken cancellationToken)
     {
         var command = new ChangeDriverStatusCommand(id, request.Status);
         var result = await _mediator.Send(command, cancellationToken);
@@ -195,7 +195,7 @@ public class DriversController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteDriver(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> DeleteDriver(string id, CancellationToken cancellationToken)
     {
         var command = new DeleteDriverCommand(id);
         var result = await _mediator.Send(command, cancellationToken);

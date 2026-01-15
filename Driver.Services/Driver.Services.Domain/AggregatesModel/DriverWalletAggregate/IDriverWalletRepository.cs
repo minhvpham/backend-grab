@@ -4,8 +4,8 @@ namespace Driver.Services.Domain.AggregatesModel.DriverWalletAggregate;
 
 public interface IDriverWalletRepository : IRepository<DriverWallet>
 {
-    Task<DriverWallet?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
-    Task<DriverWallet?> GetByDriverIdAsync(Guid driverId, CancellationToken cancellationToken = default);
+    Task<DriverWallet?> GetByIdAsync(string id, CancellationToken cancellationToken = default);
+    Task<DriverWallet?> GetByDriverIdAsync(string driverId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<DriverWallet>> GetWalletsWithBalanceAsync(
         decimal minBalance,
         CancellationToken cancellationToken = default);

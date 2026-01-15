@@ -2,7 +2,7 @@ namespace Driver.Services.Application.TripHistories.DTOs;
 
 public class TripSummaryDto
 {
-    public Guid Id { get; set; }
+    public string Id { get; set; } = string.Empty;
     public string OrderId { get; set; } = default!;
     public string Status { get; set; } = default!;
     public string PickupAddress { get; set; } = default!;

@@ -3,9 +3,9 @@ using Driver.Services.Domain.Exceptions;
 
 namespace Driver.Services.Domain.AggregatesModel.TripHistoryAggregate;
 
-public class TripHistory : Entity<Guid>, IAggregateRoot
+public class TripHistory : Entity<string>, IAggregateRoot
 {
-    public Guid DriverId { get; private set; }
+    public string DriverId { get; private set; } = string.Empty;
     public string OrderId { get; private set; }
     public TripStatus Status { get; private set; }
     
@@ -45,7 +45,7 @@ public class TripHistory : Entity<Guid>, IAggregateRoot
     private TripHistory() { } // For EF Core
 
     public static TripHistory Create(
-        Guid driverId,
+        string driverId,
         string orderId,
         string pickupAddress,
         double pickupLat,
@@ -70,7 +70,7 @@ public class TripHistory : Entity<Guid>, IAggregateRoot
 
         var trip = new TripHistory
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.NewGuid().ToString(),
             DriverId = driverId,
             OrderId = orderId,
             Status = TripStatus.Assigned,

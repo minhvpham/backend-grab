@@ -4,7 +4,7 @@ using MediatR;
 namespace Driver.Services.Application.DriverWallets.Commands.CollectCash;
 
 public record CollectCashCommand(
-    Guid DriverId,
+    string DriverId,
     decimal Amount,
     string OrderId,
     string? Reference = null) : IRequest<Result>;

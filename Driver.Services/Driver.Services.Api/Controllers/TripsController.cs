@@ -24,7 +24,7 @@ public class TripsController : ControllerBase
     /// Create a new trip (assign order to driver)
     /// </summary>
     [HttpPost]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateTrip([FromBody] CreateTripCommand command, CancellationToken cancellationToken)
     {
@@ -42,7 +42,7 @@ public class TripsController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetTripById(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetTripById(string id, CancellationToken cancellationToken)
     {
         var query = new GetTripByIdQuery(id);
         var result = await _mediator.Send(query, cancellationToken);
@@ -59,7 +59,7 @@ public class TripsController : ControllerBase
     [HttpGet("driver/{driverId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetDriverTrips(
-        Guid driverId,
+        string driverId,
         [FromQuery] bool activeOnly = false,
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 20,
@@ -81,7 +81,7 @@ public class TripsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateStatusRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateStatus(string id, [FromBody] UpdateStatusRequest request, CancellationToken cancellationToken)
     {
         var command = new UpdateTripStatusCommand(id, request.Action);
         var result = await _mediator.Send(command, cancellationToken);
@@ -101,7 +101,7 @@ public class TripsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> CompleteTrip(Guid id, [FromBody] CompleteTripRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> CompleteTrip(string id, [FromBody] CompleteTripRequest request, CancellationToken cancellationToken)
     {
         var command = new CompleteTripCommand(id, request.CashCollected, request.DriverNotes);
         var result = await _mediator.Send(command, cancellationToken);
@@ -121,7 +121,7 @@ public class TripsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> CancelTrip(Guid id, [FromBody] CancelTripRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> CancelTrip(string id, [FromBody] CancelTripRequest request, CancellationToken cancellationToken)
     {
         var command = new CancelTripCommand(id, request.Reason);
         var result = await _mediator.Send(command, cancellationToken);

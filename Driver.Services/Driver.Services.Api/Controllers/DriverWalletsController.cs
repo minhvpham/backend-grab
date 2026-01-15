@@ -25,7 +25,7 @@ public class DriverWalletsController : ControllerBase
     [HttpGet("balance")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetBalance(Guid driverId, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetBalance(string driverId, CancellationToken cancellationToken)
     {
         var query = new GetWalletBalanceQuery(driverId);
         var result = await _mediator.Send(query, cancellationToken);
@@ -42,7 +42,7 @@ public class DriverWalletsController : ControllerBase
     [HttpGet("transactions")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetTransactions(
-        Guid driverId,
+        string driverId,
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 20,
         CancellationToken cancellationToken = default)
@@ -62,7 +62,7 @@ public class DriverWalletsController : ControllerBase
     [HttpPost("add-funds")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddFunds(Guid driverId, [FromBody] AddFundsRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> AddFunds(string driverId, [FromBody] AddFundsRequest request, CancellationToken cancellationToken)
     {
         var command = new AddFundsCommand(driverId, request.Amount, request.Reference, request.Description);
         var result = await _mediator.Send(command, cancellationToken);
@@ -79,7 +79,7 @@ public class DriverWalletsController : ControllerBase
     [HttpPost("collect-cash")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CollectCash(Guid driverId, [FromBody] CollectCashRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> CollectCash(string driverId, [FromBody] CollectCashRequest request, CancellationToken cancellationToken)
     {
         var command = new CollectCashCommand(driverId, request.Amount, request.OrderId, request.Reference);
         var result = await _mediator.Send(command, cancellationToken);
@@ -96,7 +96,7 @@ public class DriverWalletsController : ControllerBase
     [HttpPost("return-cash")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> ReturnCash(Guid driverId, [FromBody] ReturnCashRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> ReturnCash(string driverId, [FromBody] ReturnCashRequest request, CancellationToken cancellationToken)
     {
         var command = new ReturnCashCommand(driverId, request.Amount, request.Reference, request.Description);
         var result = await _mediator.Send(command, cancellationToken);

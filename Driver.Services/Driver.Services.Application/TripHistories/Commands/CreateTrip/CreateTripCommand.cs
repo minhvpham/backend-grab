@@ -4,7 +4,7 @@ using MediatR;
 namespace Driver.Services.Application.TripHistories.Commands.CreateTrip;
 
 public record CreateTripCommand(
-    Guid DriverId,
+    string DriverId,
     string OrderId,
     string PickupAddress,
     double PickupLatitude,
@@ -13,4 +13,4 @@ public record CreateTripCommand(
     double DeliveryLatitude,
     double DeliveryLongitude,
     decimal Fare,
-    string? CustomerNotes = null) : IRequest<Result<Guid>>;
+    string? CustomerNotes = null) : IRequest<Result<string>>;

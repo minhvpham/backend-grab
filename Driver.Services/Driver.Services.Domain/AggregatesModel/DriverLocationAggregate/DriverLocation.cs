@@ -3,9 +3,9 @@ using Driver.Services.Domain.Exceptions;
 
 namespace Driver.Services.Domain.AggregatesModel.DriverLocationAggregate;
 
-public class DriverLocation : Entity<Guid>, IAggregateRoot
+public class DriverLocation : Entity<string>, IAggregateRoot
 {
-    public Guid DriverId { get; private set; }
+    public string DriverId { get; private set; } = string.Empty;
     public double Latitude { get; private set; }
     public double Longitude { get; private set; }
     public double? Accuracy { get; private set; } // in meters
@@ -18,7 +18,7 @@ public class DriverLocation : Entity<Guid>, IAggregateRoot
 
     // Factory method
     public static DriverLocation Create(
-        Guid driverId,
+        string driverId,
         double latitude,
         double longitude,
         double? accuracy = null,
@@ -29,7 +29,7 @@ public class DriverLocation : Entity<Guid>, IAggregateRoot
 
         var location = new DriverLocation
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.NewGuid().ToString(),
             DriverId = driverId,
             Latitude = latitude,
             Longitude = longitude,

@@ -5,6 +5,6 @@ using MediatR;
 namespace Driver.Services.Application.Drivers.Commands.ChangeDriverStatus;
 
 public record ChangeDriverStatusCommand(
-    Guid DriverId,
+    string DriverId,
     DriverStatus NewStatus
 ) : IRequest<Result>;

@@ -18,7 +18,7 @@ public class DriverRepository : IDriverRepository
     }
 
     public async Task<Domain.AggregatesModel.DriverAggregate.Driver?> GetByIdAsync(
-        Guid id,
+        string id,
         CancellationToken cancellationToken = default)
     {
         return await _context.Drivers

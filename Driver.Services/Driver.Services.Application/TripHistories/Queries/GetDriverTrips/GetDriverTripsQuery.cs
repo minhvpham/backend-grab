@@ -5,7 +5,7 @@ using MediatR;
 namespace Driver.Services.Application.TripHistories.Queries.GetDriverTrips;
 
 public record GetDriverTripsQuery(
-    Guid DriverId,
+    string DriverId,
     bool ActiveOnly = false,
     int PageNumber = 1,
     int PageSize = 20) : IRequest<Result<List<TripSummaryDto>>>;

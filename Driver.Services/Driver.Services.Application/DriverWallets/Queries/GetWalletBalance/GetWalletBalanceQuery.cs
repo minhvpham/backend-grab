@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Driver.Services.Application.DriverWallets.Queries.GetWalletBalance;
 
-public record GetWalletBalanceQuery(Guid DriverId) : IRequest<Result<WalletBalanceDto>>;
+public record GetWalletBalanceQuery(string DriverId) : IRequest<Result<WalletBalanceDto>>;
