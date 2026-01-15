@@ -57,8 +57,8 @@ SET default_table_access_method = heap;
 --
 
 CREATE TABLE public."DriverLocations" (
-    "Id" uuid NOT NULL,
-    "DriverId" uuid NOT NULL,
+    "Id" text NOT NULL,
+    "DriverId" text NOT NULL,
     "Latitude" double precision NOT NULL,
     "Longitude" double precision NOT NULL,
     "Accuracy" double precision,
@@ -79,8 +79,8 @@ CREATE TABLE public."DriverLocations" (
 --
 
 CREATE TABLE public."DriverWallets" (
-    "Id" uuid NOT NULL,
-    "DriverId" uuid NOT NULL,
+    "Id" text NOT NULL,
+    "DriverId" text NOT NULL,
     "Balance" numeric(18,2) NOT NULL,
     "CashOnHand" numeric(18,2) NOT NULL,
     "TotalEarnings" numeric(18,2) NOT NULL,
@@ -101,7 +101,7 @@ CREATE TABLE public."DriverWallets" (
 --
 
 CREATE TABLE public."Drivers" (
-    "Id" uuid NOT NULL,
+    "Id" text NOT NULL,
     "FullName" character varying(100) NOT NULL,
     "PhoneNumber" character varying(20) NOT NULL,
     "Email" character varying(255) NOT NULL,
@@ -131,7 +131,7 @@ CREATE TABLE public."Drivers" (
 --
 
 CREATE TABLE public."Transactions" (
-    "Id" uuid NOT NULL,
+    "Id" text NOT NULL,
     "Type" character varying(50) NOT NULL,
     "Amount" numeric(18,2) NOT NULL,
     "BalanceBefore" numeric(18,2) NOT NULL,
@@ -140,7 +140,7 @@ CREATE TABLE public."Transactions" (
     "Reference" character varying(200),
     "Description" character varying(500),
     "CreatedAt" timestamp with time zone NOT NULL,
-    "WalletId" uuid NOT NULL
+    "WalletId" text NOT NULL
 );
 
 
@@ -149,8 +149,8 @@ CREATE TABLE public."Transactions" (
 --
 
 CREATE TABLE public."TripHistories" (
-    "Id" uuid NOT NULL,
-    "DriverId" uuid NOT NULL,
+    "Id" text NOT NULL,
+    "DriverId" text NOT NULL,
     "OrderId" character varying(100) NOT NULL,
     "Status" character varying(50) NOT NULL,
     "PickupAddress" character varying(500) NOT NULL,
