@@ -63,3 +63,17 @@ public class DriverVehicleUpdatedDomainEvent : IDomainEvent
         OccurredOn = DateTimeOffset.UtcNow;
     }
 }
+
+public class DriverDeletedDomainEvent : IDomainEvent
+{
+    public Guid DriverId { get; }
+    public string FullName { get; }
+    public DateTimeOffset OccurredOn { get; }
+
+    public DriverDeletedDomainEvent(Guid driverId, string fullName)
+    {
+        DriverId = driverId;
+        FullName = fullName;
+        OccurredOn = DateTimeOffset.UtcNow;
+    }
+}

@@ -22,7 +22,7 @@ public class DriverRepository : IDriverRepository
         CancellationToken cancellationToken = default)
     {
         return await _context.Drivers
-            .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(d => d.Id == id && !d.Deleted, cancellationToken);
     }
 
     public async Task<Domain.AggregatesModel.DriverAggregate.Driver?> GetByEmailAsync(
@@ -30,7 +30,7 @@ public class DriverRepository : IDriverRepository
         CancellationToken cancellationToken = default)
     {
         return await _context.Drivers
-            .FirstOrDefaultAsync(d => d.Email == email.ToLowerInvariant(), cancellationToken);
+            .FirstOrDefaultAsync(d => d.Email == email.ToLowerInvariant() && !d.Deleted, cancellationToken);
     }
 
     public async Task<Domain.AggregatesModel.DriverAggregate.Driver?> GetByPhoneNumberAsync(
@@ -39,16 +39,16 @@ public class DriverRepository : IDriverRepository
     {
         // Clean phone number for comparison
         var cleanNumber = phoneNumber.Trim().Replace(" ", "").Replace("-", "");
-        
-        var drivers = await _context.Drivers.ToListAsync(cancellationToken);
-        return drivers.FirstOrDefault(d => d.PhoneNumber.Value == cleanNumber);
+
+        return await _context.Drivers
+            .FirstOrDefaultAsync(d => d.PhoneNumber.Value == cleanNumber && !d.Deleted, cancellationToken);
     }
 
     public async Task<IEnumerable<Domain.AggregatesModel.DriverAggregate.Driver>> GetOnlineDriversAsync(
         CancellationToken cancellationToken = default)
     {
         return await _context.Drivers
-            .Where(d => d.Status == DriverStatus.Online)
+            .Where(d => d.Status == DriverStatus.Online && !d.Deleted)
             .ToListAsync(cancellationToken);
     }
 
@@ -56,14 +56,14 @@ public class DriverRepository : IDriverRepository
         CancellationToken cancellationToken = default)
     {
         return await _context.Drivers
-            .Where(d => d.VerificationStatus == VerificationStatus.Pending)
+            .Where(d => d.VerificationStatus == VerificationStatus.Pending && !d.Deleted)
             .ToListAsync(cancellationToken);
     }
 
     public Task<IQueryable<Domain.AggregatesModel.DriverAggregate.Driver>> GetAllAsync(
         CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(_context.Drivers.AsQueryable());
+        return Task.FromResult(_context.Drivers.Where(d => !d.Deleted).AsQueryable());
     }
 
     public Domain.AggregatesModel.DriverAggregate.Driver Add(Domain.AggregatesModel.DriverAggregate.Driver driver)

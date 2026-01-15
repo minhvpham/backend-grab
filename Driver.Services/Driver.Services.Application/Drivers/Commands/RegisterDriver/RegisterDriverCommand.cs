@@ -8,4 +8,5 @@ public record RegisterDriverCommand(
     string FullName,
     string PhoneNumber,
     string Email,
-    string LicenseNumber) : IRequest<Result<DriverDto>>;
+    string LicenseNumber,
+    Guid? DriverId = null) : IRequest<Result<DriverDto>>;

@@ -4,6 +4,7 @@ using Driver.Services.Application.Drivers.Commands.UpdateVehicleInfo;
 using Driver.Services.Application.Drivers.Commands.VerifyDriver;
 using Driver.Services.Application.Drivers.Commands.RejectDriver;
 using Driver.Services.Application.Drivers.Commands.ChangeDriverStatus;
+using Driver.Services.Application.Drivers.Commands.DeleteDriver;
 using Driver.Services.Application.Drivers.Queries.GetDriverById;
 using Driver.Services.Application.Drivers.Queries.GetDrivers;
 using Driver.Services.Domain.AggregatesModel.DriverAggregate;
@@ -184,6 +185,23 @@ public class DriversController : ControllerBase
             return result.Error.Code == "Driver.NotFound"
                 ? NotFound(new { error = result.Error.Message })
                 : BadRequest(new { error = result.Error.Message });
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Delete driver (soft delete)
+    /// </summary>
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteDriver(Guid id, CancellationToken cancellationToken)
+    {
+        var command = new DeleteDriverCommand(id);
+        var result = await _mediator.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+            return NotFound(new { error = result.Error.Message });
 
         return NoContent();
     }
