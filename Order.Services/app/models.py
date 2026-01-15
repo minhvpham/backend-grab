@@ -43,7 +43,6 @@ class Profile(Base):
     name = Column(String(255), nullable=False)
     email = Column(String(255), unique=True, nullable=False, index=True)
     phone = Column(String(20), unique=True, nullable=False, index=True)
-    password = Column(String(255), nullable=False)
     role = Column(String(20), default="user", nullable=False)
     avatar = Column(String(500), nullable=True)
     address = Column(Text, nullable=True)

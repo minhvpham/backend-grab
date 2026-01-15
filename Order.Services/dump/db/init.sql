@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS profiles (
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     phone VARCHAR(20) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
     role VARCHAR(20) DEFAULT 'user' NOT NULL,
     avatar VARCHAR(500),
     address TEXT,
@@ -65,13 +64,13 @@ CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
 -- =============================================
 -- SAMPLE DATA - PROFILES
 -- =============================================
-INSERT INTO profiles (user_id, name, email, phone, password, role, address) VALUES
-('auth_user_001', 'Nguyễn Văn A', 'nguyenvana@gmail.com', '0901234567', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'user', '123 Nguyễn Huệ, Quận 1, TP.HCM'),
-('auth_user_002', 'Trần Thị B', 'tranthib@gmail.com', '0912345678', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'user', '456 Lê Lợi, Quận 3, TP.HCM'),
-('auth_user_003', 'Lê Văn C', 'levanc@gmail.com', '0923456789', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'user', '789 Trần Hưng Đạo, Quận 5, TP.HCM'),
-('auth_driver_001', 'Phạm Văn D', 'driver1@gmail.com', '0934567890', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'shipper', '321 Võ Văn Tần, Quận 3, TP.HCM'),
-('auth_driver_002', 'Hoàng Thị E', 'driver2@gmail.com', '0945678901', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'shipper', '654 Điện Biên Phủ, Quận Bình Thạnh, TP.HCM'),
-('auth_admin_001', 'Admin System', 'admin@grabfood.vn', '0900000000', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'admin', 'HCM')
+INSERT INTO profiles (user_id, name, email, phone, role, address) VALUES
+('auth_user_001', 'Nguyễn Văn A', 'nguyenvana@gmail.com', '0901234567', 'user', '123 Nguyễn Huệ, Quận 1, TP.HCM'),
+('auth_user_002', 'Trần Thị B', 'tranthib@gmail.com', '0912345678', 'user', '456 Lê Lợi, Quận 3, TP.HCM'),
+('auth_user_003', 'Lê Văn C', 'levanc@gmail.com', '0923456789', 'user', '789 Trần Hưng Đạo, Quận 5, TP.HCM'),
+('auth_driver_001', 'Phạm Văn D', 'driver1@gmail.com', '0934567890', 'shipper', '321 Võ Văn Tần, Quận 3, TP.HCM'),
+('auth_driver_002', 'Hoàng Thị E', 'driver2@gmail.com', '0945678901', 'shipper', '654 Điện Biên Phủ, Quận Bình Thạnh, TP.HCM'),
+('auth_admin_001', 'Admin System', 'admin@grabfood.vn', '0900000000', 'admin', 'HCM')
 ON CONFLICT (user_id) DO NOTHING;
 
 -- =============================================

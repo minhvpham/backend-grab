@@ -1,23 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import Optional
-import hashlib
 
 from ..database import get_db
 from .. import schemas
 from ..models import Profile
-import uuid
 
 router = APIRouter(
     prefix="/profiles",
     tags=["Profiles"],
     responses={404: {"description": "Not found"}}
 )
-
-
-def hash_password(password: str) -> str:
-    """Hash password using SHA256"""
-    return hashlib.sha256(password.encode()).hexdigest()
 
 
 @router.post("/", response_model=schemas.ProfileSingleResponse, status_code=201)
@@ -42,7 +35,6 @@ def create_profile(profile: schemas.ProfileCreate, db: Session = Depends(get_db)
         name=profile.name,
         email=profile.email,
         phone=profile.phone,
-        password=hash_password(profile.password),
         role="user",  # Default role
         avatar=profile.avatar,
         address=profile.address
@@ -101,8 +93,6 @@ def update_profile(user_id: str, profile_update: schemas.ProfileUpdate, db: Sess
         raise HTTPException(status_code=404, detail="Profile không tồn tại")
     
     update_data = profile_update.model_dump(exclude_unset=True)
-    if "password" in update_data:
-        update_data["password"] = hash_password(update_data["password"])
     if "role" in update_data and update_data["role"]:
         update_data["role"] = update_data["role"].value
     
