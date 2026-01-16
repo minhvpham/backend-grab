@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 from app.api import api_router
 from app.db.base import Base, engine
 
@@ -11,6 +13,13 @@ app = FastAPI(
     description="API for managing restaurants in the Grab-like food delivery system",
     version="1.0.0"
 )
+
+# Ensure uploads directory exists
+UPLOAD_DIR = Path("uploads")
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+# Mount static files for serving uploaded images
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # Include API routes
 app.include_router(api_router, prefix="/api/v1")
