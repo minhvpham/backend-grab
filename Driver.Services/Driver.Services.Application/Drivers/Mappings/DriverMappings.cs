@@ -17,6 +17,9 @@ public static class DriverMappings
             VerificationStatus = driver.VerificationStatus.ToString(),
             LicenseNumber = driver.LicenseNumber,
             ProfileImageUrl = driver.ProfileImageUrl,
+            CitizenIdImageUrl = driver.CitizenIdImageUrl,
+            DriverLicenseImageUrl = driver.DriverLicenseImageUrl,
+            DriverRegistrationImageUrl = driver.DriverRegistrationImageUrl,
             VehicleInfo = driver.VehicleInfo?.ToDto(),
             VerifiedAt = driver.VerifiedAt,
             RejectionReason = driver.RejectionReason,
@@ -34,7 +37,10 @@ public static class DriverMappings
             PhoneNumber = driver.PhoneNumber.Value,
             Status = driver.Status.ToString(),
             VerificationStatus = driver.VerificationStatus.ToString(),
-            ProfileImageUrl = driver.ProfileImageUrl
+            ProfileImageUrl = driver.ProfileImageUrl,
+            CitizenIdImageUrl = driver.CitizenIdImageUrl,
+            DriverLicenseImageUrl = driver.DriverLicenseImageUrl,
+            DriverRegistrationImageUrl = driver.DriverRegistrationImageUrl
         };
     }
 

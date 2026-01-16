@@ -77,6 +77,15 @@ public class DriverConfiguration : IEntityTypeConfiguration<Domain.AggregatesMod
         builder.Property(d => d.ProfileImageUrl)
             .HasMaxLength(500);
 
+        builder.Property(d => d.CitizenIdImageUrl)
+            .HasMaxLength(500);
+
+        builder.Property(d => d.DriverLicenseImageUrl)
+            .HasMaxLength(500);
+
+        builder.Property(d => d.DriverRegistrationImageUrl)
+            .HasMaxLength(500);
+
         builder.Property(d => d.VerifiedAt);
 
         builder.Property(d => d.RejectionReason)

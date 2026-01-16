@@ -5,11 +5,14 @@ using Driver.Services.Application.Drivers.Commands.VerifyDriver;
 using Driver.Services.Application.Drivers.Commands.RejectDriver;
 using Driver.Services.Application.Drivers.Commands.ChangeDriverStatus;
 using Driver.Services.Application.Drivers.Commands.DeleteDriver;
+using Driver.Services.Application.Drivers.Commands.UploadDriverDocuments;
 using Driver.Services.Application.Drivers.Queries.GetDriverById;
 using Driver.Services.Application.Drivers.Queries.GetDrivers;
 using Driver.Services.Domain.AggregatesModel.DriverAggregate;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace Driver.Services.Api.Controllers;
 
@@ -24,14 +27,61 @@ public class DriversController : ControllerBase
         _mediator = mediator;
     }
 
+    private async Task<string?> SaveFileAsync(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return null;
+
+        // Validate file type
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (!allowedExtensions.Contains(extension))
+            throw new ArgumentException("Invalid file type. Only image files are allowed.");
+
+        // Validate file size (5MB max)
+        const long maxFileSize = 5 * 1024 * 1024;
+        if (file.Length > maxFileSize)
+            throw new ArgumentException("File size exceeds the maximum allowed size of 5MB.");
+
+        // Generate unique filename
+        var fileName = $"{Guid.NewGuid()}{extension}";
+        var filePath = Path.Combine("uploads", fileName);
+
+        // Ensure directory exists
+        Directory.CreateDirectory("uploads");
+
+        // Save file
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream);
+        }
+
+        return $"/uploads/{fileName}";
+    }
+
     /// <summary>
     /// Register a new driver
     /// </summary>
     [HttpPost]
     [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> RegisterDriver([FromBody] RegisterDriverCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> RegisterDriver([FromForm] RegisterDriverRequest request, CancellationToken cancellationToken)
     {
+        // Process uploaded files
+        var citizenIdPath = request.CitizenIdImage != null ? await SaveFileAsync(request.CitizenIdImage) : null;
+        var licensePath = request.DriverLicenseImage != null ? await SaveFileAsync(request.DriverLicenseImage) : null;
+        var registrationPath = request.DriverRegistrationImage != null ? await SaveFileAsync(request.DriverRegistrationImage) : null;
+
+        var command = new RegisterDriverCommand(
+            request.FullName,
+            request.PhoneNumber,
+            request.Email,
+            request.LicenseNumber,
+            citizenIdPath,
+            licensePath,
+            registrationPath,
+            request.DriverId);
+
         var result = await _mediator.Send(command, cancellationToken);
 
         if (result.IsFailure)
@@ -80,7 +130,7 @@ public class DriversController : ControllerBase
     }
 
     /// <summary>
-    /// Update driver profile
+    /// Update driver profile (scalar data only, no file handling)
     /// </summary>
     [HttpPut("{id}/profile")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -91,13 +141,42 @@ public class DriversController : ControllerBase
         var command = new UpdateDriverProfileCommand(
             id,
             request.FullName,
-            request.Email,
-            request.ProfileImageUrl);
+            request.Email);
 
         var result = await _mediator.Send(command, cancellationToken);
 
         if (result.IsFailure)
-            return result.Error.Code == "Driver.NotFound" 
+            return result.Error.Code == "Driver.NotFound"
+                ? NotFound(new { error = result.Error.Message })
+                : BadRequest(new { error = result.Error.Message });
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Upload driver verification documents
+    /// </summary>
+    [HttpPost("{id}/upload-documents")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UploadDocuments(string id, [FromForm] UploadDocumentsRequest request, CancellationToken cancellationToken)
+    {
+        // Process uploaded files
+        var citizenIdPath = request.CitizenIdImage != null ? await SaveFileAsync(request.CitizenIdImage) : null;
+        var licensePath = request.DriverLicenseImage != null ? await SaveFileAsync(request.DriverLicenseImage) : null;
+        var registrationPath = request.DriverRegistrationImage != null ? await SaveFileAsync(request.DriverRegistrationImage) : null;
+
+        var command = new UploadDriverDocumentsCommand(
+            id,
+            citizenIdPath,
+            licensePath,
+            registrationPath);
+
+        var result = await _mediator.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+            return result.Error.Code == "Driver.NotFound"
                 ? NotFound(new { error = result.Error.Message })
                 : BadRequest(new { error = result.Error.Message });
 
@@ -208,11 +287,25 @@ public class DriversController : ControllerBase
 }
 
 // Request models
+public record RegisterDriverRequest(
+    string FullName,
+    string PhoneNumber,
+    string Email,
+    string LicenseNumber,
+    IFormFile? CitizenIdImage,
+    IFormFile? DriverLicenseImage,
+    IFormFile? DriverRegistrationImage,
+    string? DriverId = null);
+
+public record UploadDocumentsRequest(
+    IFormFile? CitizenIdImage,
+    IFormFile? DriverLicenseImage,
+    IFormFile? DriverRegistrationImage);
+
 public record UpdateDriverProfileRequest(
     string FullName,
     string Email,
-    string PhoneNumber,
-    string? ProfileImageUrl);
+    string PhoneNumber);
 
 public record UpdateVehicleInfoRequest(
     string VehicleType,

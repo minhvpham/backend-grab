@@ -12,6 +12,9 @@ public record DriverDto
     public string VerificationStatus { get; init; } = string.Empty;
     public string? LicenseNumber { get; init; }
     public string? ProfileImageUrl { get; init; }
+    public string? CitizenIdImageUrl { get; init; }
+    public string? DriverLicenseImageUrl { get; init; }
+    public string? DriverRegistrationImageUrl { get; init; }
     public VehicleInfoDto? VehicleInfo { get; init; }
     public DateTimeOffset? VerifiedAt { get; init; }
     public string? RejectionReason { get; init; }
@@ -37,4 +40,7 @@ public record DriverSummaryDto
     public string Status { get; init; } = string.Empty;
     public string VerificationStatus { get; init; } = string.Empty;
     public string? ProfileImageUrl { get; init; }
+    public string? CitizenIdImageUrl { get; init; }
+    public string? DriverLicenseImageUrl { get; init; }
+    public string? DriverRegistrationImageUrl { get; init; }
 }

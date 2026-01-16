@@ -23,10 +23,5 @@ public class UpdateDriverProfileCommandValidator : AbstractValidator<UpdateDrive
             .WithMessage("Invalid email format.")
             .MaximumLength(255)
             .WithMessage("Email must not exceed 255 characters.");
-
-        RuleFor(x => x.ProfileImage)
-            .MaximumLength(500)
-            .WithMessage("Profile image URL must not exceed 500 characters.")
-            .When(x => !string.IsNullOrWhiteSpace(x.ProfileImage));
     }
 }

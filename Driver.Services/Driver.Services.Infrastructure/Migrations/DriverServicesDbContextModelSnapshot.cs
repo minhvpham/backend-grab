@@ -3,20 +3,17 @@ using System;
 using Driver.Services.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Driver.Services.Infrastructure.Persistence.Migrations
+namespace Driver.Services.Infrastructure.Migrations
 {
     [DbContext(typeof(DriverServicesDbContext))]
-    [Migration("20260112174418_InitialCreate")]
-    partial class InitialCreate
+    partial class DriverServicesDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,8 +24,12 @@ namespace Driver.Services.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Driver.Services.Domain.AggregatesModel.DriverAggregate.Driver", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CitizenIdImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -38,6 +39,14 @@ namespace Driver.Services.Infrastructure.Persistence.Migrations
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DriverLicenseImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("DriverRegistrationImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -97,8 +106,8 @@ namespace Driver.Services.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Driver.Services.Domain.AggregatesModel.DriverLocationAggregate.DriverLocation", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
 
                     b.Property<double?>("Accuracy")
                         .HasColumnType("double precision");
@@ -112,8 +121,9 @@ namespace Driver.Services.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("DriverId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("DriverId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<double?>("Heading")
                         .HasColumnType("double precision");
@@ -153,8 +163,8 @@ namespace Driver.Services.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Driver.Services.Domain.AggregatesModel.DriverWalletAggregate.DriverWallet", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
 
                     b.Property<decimal>("Balance")
                         .HasPrecision(18, 2)
@@ -173,8 +183,9 @@ namespace Driver.Services.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("DriverId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("DriverId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -211,8 +222,8 @@ namespace Driver.Services.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Driver.Services.Domain.AggregatesModel.TripHistoryAggregate.TripHistory", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("AcceptedAt")
                         .HasColumnType("timestamp with time zone");
@@ -268,8 +279,9 @@ namespace Driver.Services.Infrastructure.Persistence.Migrations
                     b.Property<double?>("DistanceKm")
                         .HasColumnType("double precision");
 
-                    b.Property<Guid>("DriverId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("DriverId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("DriverNotes")
                         .HasMaxLength(1000)
@@ -339,8 +351,8 @@ namespace Driver.Services.Infrastructure.Persistence.Migrations
                 {
                     b.OwnsOne("Driver.Services.Domain.AggregatesModel.DriverAggregate.PhoneNumber", "PhoneNumber", b1 =>
                         {
-                            b1.Property<Guid>("DriverId")
-                                .HasColumnType("uuid");
+                            b1.Property<string>("DriverId")
+                                .HasColumnType("text");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
@@ -358,8 +370,8 @@ namespace Driver.Services.Infrastructure.Persistence.Migrations
 
                     b.OwnsOne("Driver.Services.Domain.AggregatesModel.DriverAggregate.VehicleInfo", "VehicleInfo", b1 =>
                         {
-                            b1.Property<Guid>("DriverId")
-                                .HasColumnType("uuid");
+                            b1.Property<string>("DriverId")
+                                .HasColumnType("text");
 
                             b1.Property<string>("LicensePlate")
                                 .IsRequired()
@@ -445,8 +457,9 @@ namespace Driver.Services.Infrastructure.Persistence.Migrations
                                 .HasMaxLength(50)
                                 .HasColumnType("character varying(50)");
 
-                            b1.Property<Guid>("WalletId")
-                                .HasColumnType("uuid");
+                            b1.Property<string>("WalletId")
+                                .IsRequired()
+                                .HasColumnType("text");
 
                             b1.HasKey("Id");
 

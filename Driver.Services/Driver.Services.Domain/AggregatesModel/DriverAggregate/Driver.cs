@@ -13,6 +13,9 @@ public class Driver : Entity<string>, IAggregateRoot
     public VehicleInfo? VehicleInfo { get; private set; }
     public string? LicenseNumber { get; private set; }
     public string? ProfileImageUrl { get; private set; }
+    public string? CitizenIdImageUrl { get; private set; }
+    public string? DriverLicenseImageUrl { get; private set; }
+    public string? DriverRegistrationImageUrl { get; private set; }
     public DateTimeOffset? VerifiedAt { get; private set; }
     public string? RejectionReason { get; private set; }
 
@@ -25,6 +28,9 @@ public class Driver : Entity<string>, IAggregateRoot
         string phoneNumber,
         string email,
         string? licenseNumber = null,
+        string? citizenIdImageUrl = null,
+        string? driverLicenseImageUrl = null,
+        string? driverRegistrationImageUrl = null,
         string? id = null)
     {
         var driver = new Driver
@@ -35,7 +41,10 @@ public class Driver : Entity<string>, IAggregateRoot
             Email = ValidateEmail(email),
             Status = DriverStatus.Offline,
             VerificationStatus = VerificationStatus.Pending,
-            LicenseNumber = licenseNumber?.Trim()
+            LicenseNumber = licenseNumber?.Trim(),
+            CitizenIdImageUrl = citizenIdImageUrl?.Trim(),
+            DriverLicenseImageUrl = driverLicenseImageUrl?.Trim(),
+            DriverRegistrationImageUrl = driverRegistrationImageUrl?.Trim()
         };
 
         driver.AddDomainEvent(new DriverRegisteredDomainEvent(driver.Id, driver.FullName, driver.Email));
@@ -119,7 +128,8 @@ public class Driver : Entity<string>, IAggregateRoot
     }
 
     // Profile management
-    public void UpdateProfile(string? fullName = null, string? email = null, string? profileImageUrl = null)
+    public void UpdateProfile(string? fullName = null, string? email = null, string? profileImageUrl = null,
+        string? citizenIdImageUrl = null, string? driverLicenseImageUrl = null, string? driverRegistrationImageUrl = null)
     {
         if (!string.IsNullOrWhiteSpace(fullName))
             FullName = ValidateFullName(fullName);
@@ -129,6 +139,15 @@ public class Driver : Entity<string>, IAggregateRoot
 
         if (!string.IsNullOrWhiteSpace(profileImageUrl))
             ProfileImageUrl = profileImageUrl.Trim();
+
+        if (citizenIdImageUrl != null)
+            CitizenIdImageUrl = citizenIdImageUrl.Trim();
+
+        if (driverLicenseImageUrl != null)
+            DriverLicenseImageUrl = driverLicenseImageUrl.Trim();
+
+        if (driverRegistrationImageUrl != null)
+            DriverRegistrationImageUrl = driverRegistrationImageUrl.Trim();
 
         UpdateUpdatedAt(DateTimeOffset.UtcNow);
     }

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Driver.Services.Infrastructure.Persistence.Migrations
+namespace Driver.Services.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -15,8 +15,8 @@ namespace Driver.Services.Infrastructure.Persistence.Migrations
                 name: "DriverLocations",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    DriverId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    DriverId = table.Column<string>(type: "text", nullable: false),
                     Latitude = table.Column<double>(type: "double precision", nullable: false),
                     Longitude = table.Column<double>(type: "double precision", nullable: false),
                     Accuracy = table.Column<double>(type: "double precision", nullable: true),
@@ -39,7 +39,7 @@ namespace Driver.Services.Infrastructure.Persistence.Migrations
                 name: "Drivers",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<string>(type: "text", nullable: false),
                     FullName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     PhoneNumber = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
@@ -53,6 +53,9 @@ namespace Driver.Services.Infrastructure.Persistence.Migrations
                     VehicleColor = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: true),
                     LicenseNumber = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     ProfileImageUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    CitizenIdImageUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    DriverLicenseImageUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    DriverRegistrationImageUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     VerifiedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     RejectionReason = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -71,8 +74,8 @@ namespace Driver.Services.Infrastructure.Persistence.Migrations
                 name: "DriverWallets",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    DriverId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    DriverId = table.Column<string>(type: "text", nullable: false),
                     Balance = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
                     CashOnHand = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
                     TotalEarnings = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
@@ -95,8 +98,8 @@ namespace Driver.Services.Infrastructure.Persistence.Migrations
                 name: "TripHistories",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    DriverId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    DriverId = table.Column<string>(type: "text", nullable: false),
                     OrderId = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     PickupAddress = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
@@ -145,7 +148,7 @@ namespace Driver.Services.Infrastructure.Persistence.Migrations
                     Reference = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
                     Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    WalletId = table.Column<Guid>(type: "uuid", nullable: false)
+                    WalletId = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {

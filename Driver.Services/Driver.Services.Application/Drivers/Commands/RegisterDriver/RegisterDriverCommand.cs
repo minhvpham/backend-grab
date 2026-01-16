@@ -9,4 +9,7 @@ public record RegisterDriverCommand(
     string PhoneNumber,
     string Email,
     string LicenseNumber,
+    string? CitizenIdImageUrl = null,
+    string? DriverLicenseImageUrl = null,
+    string? DriverRegistrationImageUrl = null,
     string? DriverId = null) : IRequest<Result<DriverDto>>;

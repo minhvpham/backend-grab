@@ -25,5 +25,17 @@ public class RegisterDriverCommandValidator : AbstractValidator<RegisterDriverCo
 
         RuleFor(x => x.DriverId)
             .Must(id => id == null || !string.IsNullOrWhiteSpace(id)).WithMessage("Driver ID cannot be empty or whitespace");
+
+        RuleFor(x => x.CitizenIdImageUrl)
+            .MaximumLength(500).WithMessage("Citizen ID image URL must not exceed 500 characters")
+            .Must(url => url == null || Uri.IsWellFormedUriString(url, UriKind.Absolute)).WithMessage("Citizen ID image URL must be a valid URL");
+
+        RuleFor(x => x.DriverLicenseImageUrl)
+            .MaximumLength(500).WithMessage("Driver license image URL must not exceed 500 characters")
+            .Must(url => url == null || Uri.IsWellFormedUriString(url, UriKind.Absolute)).WithMessage("Driver license image URL must be a valid URL");
+
+        RuleFor(x => x.DriverRegistrationImageUrl)
+            .MaximumLength(500).WithMessage("Driver registration image URL must not exceed 500 characters")
+            .Must(url => url == null || Uri.IsWellFormedUriString(url, UriKind.Absolute)).WithMessage("Driver registration image URL must be a valid URL");
     }
 }

@@ -58,6 +58,9 @@ public class RegisterDriverCommandHandler : IRequestHandler<RegisterDriverComman
                 request.PhoneNumber,
                 request.Email,
                 request.LicenseNumber,
+                request.CitizenIdImageUrl,
+                request.DriverLicenseImageUrl,
+                request.DriverRegistrationImageUrl,
                 driverId);
 
             _driverRepository.Add(driver);
