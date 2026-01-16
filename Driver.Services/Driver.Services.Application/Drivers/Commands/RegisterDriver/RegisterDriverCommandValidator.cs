@@ -28,14 +28,21 @@ public class RegisterDriverCommandValidator : AbstractValidator<RegisterDriverCo
 
         RuleFor(x => x.CitizenIdImageUrl)
             .MaximumLength(500).WithMessage("Citizen ID image URL must not exceed 500 characters")
-            .Must(url => url == null || Uri.IsWellFormedUriString(url, UriKind.Absolute)).WithMessage("Citizen ID image URL must be a valid URL");
+            .Must(url => url == null || IsValidUrl(url)).WithMessage("Citizen ID image URL must be a valid URL");
 
         RuleFor(x => x.DriverLicenseImageUrl)
             .MaximumLength(500).WithMessage("Driver license image URL must not exceed 500 characters")
-            .Must(url => url == null || Uri.IsWellFormedUriString(url, UriKind.Absolute)).WithMessage("Driver license image URL must be a valid URL");
+            .Must(url => url == null || IsValidUrl(url)).WithMessage("Driver license image URL must be a valid URL");
 
         RuleFor(x => x.DriverRegistrationImageUrl)
             .MaximumLength(500).WithMessage("Driver registration image URL must not exceed 500 characters")
-            .Must(url => url == null || Uri.IsWellFormedUriString(url, UriKind.Absolute)).WithMessage("Driver registration image URL must be a valid URL");
+            .Must(url => url == null || IsValidUrl(url)).WithMessage("Driver registration image URL must be a valid URL");
+    }
+
+    private bool IsValidUrl(string url)
+    {
+        // Allow both absolute and relative URLs
+        return Uri.IsWellFormedUriString(url, UriKind.Absolute) ||
+               Uri.IsWellFormedUriString(url, UriKind.Relative);
     }
 }
