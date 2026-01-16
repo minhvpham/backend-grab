@@ -1,7 +1,6 @@
 import enum
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Text, Boolean, Numeric, ForeignKey, DateTime, Enum
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, Text, Boolean, Numeric, DateTime, Enum
 from app.db.base import Base
 
 
@@ -16,8 +15,8 @@ class Restaurant(Base):
     __tablename__ = "restaurants"
 
     id = Column(Integer, primary_key=True, index=True)
-    # Owner ID from Users table 
-    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    # Owner ID stored without foreign key constraint
+    owner_id = Column(Integer, nullable=False)
     
     name = Column(String(100), nullable=False)
     description = Column(Text, nullable=True)
@@ -35,7 +34,3 @@ class Restaurant(Base):
     # Status for admin approval 
     status = Column(Enum(RestaurantStatus), default=RestaurantStatus.PENDING)
     created_at = Column(DateTime, default=datetime.utcnow)
-    
-    # Relationships (can be added later when User, MenuItem models exist)
-    # owner = relationship("User", back_populates="restaurants")
-    # menu_items = relationship("MenuItem", back_populates="restaurant")
