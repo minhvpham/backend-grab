@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import api_router
@@ -14,6 +16,12 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Ensure uploads directory exists
+UPLOAD_DIR = Path("uploads")
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+# Mount static files for serving uploaded images
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 # CORS middleware (cho phép frontend gọi API)
 app.add_middleware(
     CORSMiddleware,
