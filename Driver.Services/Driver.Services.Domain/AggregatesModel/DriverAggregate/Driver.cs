@@ -128,7 +128,7 @@ public class Driver : Entity<string>, IAggregateRoot
     }
 
     // Profile management
-    public void UpdateProfile(string? fullName = null, string? email = null, string? profileImageUrl = null,
+    public void UpdateProfile(string? fullName = null, string? email = null, string? phoneNumber = null, string? profileImageUrl = null,
         string? citizenIdImageUrl = null, string? driverLicenseImageUrl = null, string? driverRegistrationImageUrl = null)
     {
         if (!string.IsNullOrWhiteSpace(fullName))
@@ -136,6 +136,9 @@ public class Driver : Entity<string>, IAggregateRoot
 
         if (!string.IsNullOrWhiteSpace(email))
             Email = ValidateEmail(email);
+
+        if (!string.IsNullOrWhiteSpace(phoneNumber))
+            PhoneNumber = new PhoneNumber(phoneNumber);
 
         if (!string.IsNullOrWhiteSpace(profileImageUrl))
             ProfileImageUrl = profileImageUrl.Trim();

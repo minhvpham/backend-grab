@@ -141,7 +141,8 @@ public class DriversController : ControllerBase
         var command = new UpdateDriverProfileCommand(
             id,
             request.FullName,
-            request.Email);
+            request.Email,
+            request.PhoneNumber);
 
         var result = await _mediator.Send(command, cancellationToken);
 
