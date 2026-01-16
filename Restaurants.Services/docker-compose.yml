@@ -34,6 +34,7 @@ services:
     volumes:
       - .:/app
       - /app/__pycache__
+      - uploaded_files:/app/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -51,6 +52,7 @@ services:
 
 volumes:
   postgres_data:
+  uploaded_files:
 
 networks:
   grab_network:

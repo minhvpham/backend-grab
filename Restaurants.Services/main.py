@@ -1,7 +1,10 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.api import api_router
 from app.db.base import Base, engine
-from fastapi.middleware.cors import CORSMiddleware
 
 # Create database tables
 # Note: In production, use Alembic migrations instead
@@ -13,12 +16,16 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Ensure uploads directory exists
+UPLOAD_DIR = Path("uploads")
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+# Mount static files for serving uploaded images
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+# CORS middleware (cho phép frontend gọi API)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",   # React / Next.js local
-        "http://localhost:5173",   # Vite
-    ],
+    allow_origins=["*"],  # Trong production, thay bằng domain cụ thể
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
