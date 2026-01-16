@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.api import api_router
 from app.db.base import Base, engine
 
@@ -11,6 +13,16 @@ app = FastAPI(
     description="API for managing restaurants in the Grab-like food delivery system",
     version="1.0.0"
 )
+
+# CORS middleware (cho phép frontend gọi API)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Trong production, thay bằng domain cụ thể
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # Include API routes
 app.include_router(api_router, prefix="/api/v1")
