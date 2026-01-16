@@ -1,0 +1,43 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/*.dll
+**/*.exe
+**/*.pdb
+**/*.user
+
+# IDE and editor files
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+
+# Docker files
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Documentation
+README.md
+*.md
+docs/
+
+# Test and temporary files
+dump/req/
+**/*.tmp
+**/*.log
+
+# OpenSpec
+openspec/
+
+# OS files
+.DS_Store
+Thumbs.db

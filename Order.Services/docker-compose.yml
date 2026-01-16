@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database for Order Service
+  postgres:
+    image: postgres:16
+    container_name: order-service-postgres
+    environment:
+      POSTGRES_DB: order_service_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1
+    ports:
+      - "5434:5432" # Port 5434 to avoid conflict with User Service
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./dump/db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Order Service API
+  order-service:
+    build: .
+    container_name: order-service-api
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: order_service_db
+    ports:
+      - "8002:8000" # Port 8002 for Order Service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

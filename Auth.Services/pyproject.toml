@@ -1,0 +1,19 @@
+[project]
+name = "se-backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "alembic>=1.18.0",
+    "bcrypt==3.2.0",
+    "fastapi[standard]>=0.128.0",
+    "jose>=1.0.0",
+    "passlib[bcrypt]>=1.7.4",
+    "psycopg2-binary>=2.9.11",
+    "pydantic>=2.12.5",
+    "python-dotenv>=1.2.1",
+    "python-jose[cryptography]>=3.5.0",
+    "python-multipart>=0.0.21",
+    "sqlalchemy>=2.0.45",
+]

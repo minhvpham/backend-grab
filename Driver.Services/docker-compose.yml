@@ -1,0 +1,58 @@
+services:
+  driver-services-db:
+    image: postgres:16.9
+    container_name: driver-services-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: united_password
+      POSTGRES_DB: driver_services
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      # - ./dump/db/db_dump.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - driver-services-network
+
+  driver-services-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: driver-services:latest
+    container_name: driver-services-api
+    depends_on:
+      driver-services-db:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=driver-services-db;Port=5432;Database=driver_services;Username=postgres;Password=united_password
+      - JwtSettings__SecretKey=YourSuperSecretKeyThatIsAtLeast32CharactersLong!
+      - JwtSettings__Issuer=DriverServicesApi
+      - JwtSettings__Audience=DriverServicesClient
+      - JwtSettings__ExpirationMinutes=1440
+    ports:
+      - "8081:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - driver-services-network
+
+volumes:
+  db_data:
+    driver: local
+
+networks:
+  driver-services-network:
+    driver: bridge

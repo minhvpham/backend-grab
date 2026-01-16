@@ -1,57 +1,92 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  # PostgreSQL Database
-  db:
-    image: postgres:15-alpine
-    container_name: grab_backend_db
+  # Shared PostgreSQL Database for Order, Driver, Auth, and Restaurants Services
+  postgres:
+    image: postgres:16
+    container_name: united-services-postgres
     environment:
-      POSTGRES_USER: grab_user
-      POSTGRES_PASSWORD: grab_password
-      POSTGRES_DB: grab_restaurant_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: united_password
+      POSTGRES_DB: postgres # Default database
     ports:
-      - "5432:5432"
+      - "5432:5432" # Use standard port 5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      # Only create databases, let services handle schema with migrations
+      - ./init-united-db.sql:/docker-entrypoint-initdb.d/00-create-databases.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U grab_user -d grab_restaurant_db"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - grab_network
 
-  # FastAPI Backend Application
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: grab_backend_app
+  # Order Service API
+  order-service:
+    build: ./Order.Services
+    container_name: united-order-service-api
     environment:
-      DATABASE_URL: postgresql://grab_user:grab_password@db:5432/grab_restaurant_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: united_password
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: order_service_db
     ports:
-      - "8080:8080"
-    volumes:
-      - .:/app
-      - /app/__pycache__  
+      - "8002:8000"
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
-    networks:
-      - grab_network
-    command: >
-      sh -c "
-        echo 'Waiting for database to be ready...' &&
-        sleep 5 &&
-        echo 'Running database migrations...' &&
-        alembic upgrade head &&
-        echo 'Starting application...' &&
-        uvicorn main:app --host 0.0.0.0 --port 8080 --reload
-      "
+    restart: unless-stopped
+
+  # Driver Service API
+  driver-service:
+    build: ./Driver.Services
+    container_name: united-driver-service-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=driver_services;Username=postgres;Password=united_password
+      - JwtSettings__SecretKey=YourSuperSecretKeyThatIsAtLeast32CharactersLong!
+      - JwtSettings__Issuer=DriverServicesApi
+      - JwtSettings__Audience=DriverServicesClient
+      - JwtSettings__ExpirationMinutes=1440
+    ports:
+      - "8001:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Auth Service API
+  auth-service:
+    build: ./Auth.Services
+    container_name: united-auth-service-api
+    environment:
+      - DATABASE_URL=postgresql://postgres:united_password@postgres:5432/auth_services
+      - SECRET_KEY=SECRET_KEY_CHANGE_ME
+    ports:
+      - "8003:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Restaurants Service API (NEW)
+  restaurants-service:
+    build: ./Restaurants.Services
+    container_name: united-restaurants-service-api
+    environment:
+      - DATABASE_URL=postgresql://postgres:united_password@postgres:5432/restaurants_services
+    ports:
+      - "8004:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   postgres_data:
 
 networks:
-  grab_network:
-    driver: bridge
+  default:
+    name: united-services-network
