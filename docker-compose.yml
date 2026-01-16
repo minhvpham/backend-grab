@@ -1,0 +1,92 @@
+version: "3.8"
+
+services:
+  # Shared PostgreSQL Database for Order, Driver, Auth, and Restaurants Services
+  postgres:
+    image: postgres:16
+    container_name: united-services-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: united_password
+      POSTGRES_DB: postgres # Default database
+    ports:
+      - "5432:5432" # Use standard port 5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Only create databases, let services handle schema with migrations
+      - ./init-united-db.sql:/docker-entrypoint-initdb.d/00-create-databases.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Order Service API
+  order-service:
+    build: ./Order.Services
+    container_name: united-order-service-api
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: united_password
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: order_service_db
+    ports:
+      - "8002:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Driver Service API
+  driver-service:
+    build: ./Driver.Services
+    container_name: united-driver-service-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=driver_services;Username=postgres;Password=united_password
+      - JwtSettings__SecretKey=YourSuperSecretKeyThatIsAtLeast32CharactersLong!
+      - JwtSettings__Issuer=DriverServicesApi
+      - JwtSettings__Audience=DriverServicesClient
+      - JwtSettings__ExpirationMinutes=1440
+    ports:
+      - "8001:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Auth Service API
+  auth-service:
+    build: ./Auth.Services
+    container_name: united-auth-service-api
+    environment:
+      - DATABASE_URL=postgresql://postgres:united_password@postgres:5432/auth_services
+      - SECRET_KEY=SECRET_KEY_CHANGE_ME
+    ports:
+      - "8003:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Restaurants Service API (NEW)
+  restaurants-service:
+    build: ./Restaurants.Services
+    container_name: united-restaurants-service-api
+    environment:
+      - DATABASE_URL=postgresql://postgres:united_password@postgres:5432/restaurants_services
+    ports:
+      - "8004:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    name: united-services-network
