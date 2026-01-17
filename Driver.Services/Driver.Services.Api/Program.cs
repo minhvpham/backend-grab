@@ -8,6 +8,8 @@ using Driver.Services.Infrastructure.Persistence;
 using Driver.Services.Infrastructure.Persistence.Repositories;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Polly;
+using Polly.Extensions.Http;
 using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -83,7 +85,36 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Add HTTP client with retry policy for Order.Service
+builder.Services.AddHttpClient("OrderService", client =>
+{
+    var orderServiceUrl = builder.Configuration["ORDER_SERVICE_URL"] ?? "http://order-service:8002";
+    client.BaseAddress = new Uri(orderServiceUrl);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+    client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+})
+.AddPolicyHandler(GetRetryPolicy())
+.AddPolicyHandler(GetCircuitBreakerPolicy());
+
+// Add Order.Service client
+builder.Services.AddScoped<IOrderServiceClient, OrderServiceClient>();
+
 var app = builder.Build();
+
+// Define retry and circuit breaker policies
+static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+{
+    return HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+}
+
+static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()
+{
+    return HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .CircuitBreakerAsync(5, TimeSpan.FromSeconds(30));
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

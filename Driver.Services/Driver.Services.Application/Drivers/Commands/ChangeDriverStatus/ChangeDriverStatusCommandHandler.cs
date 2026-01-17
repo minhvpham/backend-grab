@@ -42,6 +42,9 @@ public class ChangeDriverStatusCommandHandler : IRequestHandler<ChangeDriverStat
                 case DriverStatus.Busy:
                     driver.MarkAsBusy();
                     break;
+                case DriverStatus.WaitingForAcceptance:
+                    driver.MarkAsWaitingForAcceptance();
+                    break;
                 default:
                     return Result.Failure(
                         Error.Validation("Driver.InvalidStatus", $"Invalid driver status: {request.NewStatus}"));
