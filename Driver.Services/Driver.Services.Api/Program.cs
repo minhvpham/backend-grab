@@ -1,4 +1,5 @@
 using Driver.Services.Application;
+using Driver.Services.Application.Common.ExternalServices;
 using Driver.Services.Domain.Abstractions;
 using Driver.Services.Domain.AggregatesModel.DriverAggregate;
 using Driver.Services.Domain.AggregatesModel.DriverLocationAggregate;
@@ -10,6 +11,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Polly;
 using Polly.Extensions.Http;
+using Polly.Retry;
 using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -1,4 +1,12 @@
+using Driver.Services.Application.TripHistories.Commands.CancelTrip;
+using Driver.Services.Application.TripHistories.Commands.CompleteTrip;
+using Driver.Services.Application.TripHistories.Commands.CreateTrip;
+using Driver.Services.Application.TripHistories.Commands.UpdateTripStatus;
+using Driver.Services.Application.TripHistories.Queries.GetDriverTrips;
+using Driver.Services.Application.TripHistories.Queries.GetTripById;
 using Driver.Services.Domain.AggregatesModel.TripHistoryAggregate;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Driver.Services.Api.Controllers;
 
