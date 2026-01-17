@@ -1,8 +1,3 @@
-#!/bin/sh
-set -e
-
-echo "Ensuring database exists..."
-cat <<EOF > create_db.py
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import os
@@ -16,12 +11,14 @@ def create_db():
     port = os.getenv("POSTGRES_PORT", "5432")
     target_db = os.getenv("POSTGRES_DB", "order_service_db")
     
+    # Connect to default 'postgres' db
     print(f"Connecting to postgres host: {host}")
     try:
         conn = psycopg2.connect(user=user, password=password, host=host, port=port, dbname='postgres')
         conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = conn.cursor()
         
+        # Check if db exists
         cur.execute(f"SELECT 1 FROM pg_catalog.pg_database WHERE datname = '{target_db}'")
         exists = cur.fetchone()
         
@@ -36,10 +33,13 @@ def create_db():
         conn.close()
     except Exception as e:
         print(f"Error checking/creating database: {e}")
-        # Allow proceed, maybe created by other means
-        pass
+        # Build phase might not have DB ready, or credentials wrong. 
+        # We don't exit(1) here to allow retry or manual intervention, 
+        # but Alembic will likely fail next if DB is missing.
+        sys.exit(1)
 
 if __name__ == "__main__":
+    # Simple retry logic
     for i in range(5):
         try:
             create_db()
@@ -47,13 +47,3 @@ if __name__ == "__main__":
         except Exception:
             print("Retrying DB creation in 2s...")
             time.sleep(2)
-EOF
-
-python create_db.py
-
-echo "Running database migrations..."
-alembic upgrade head
-
-# Start application
-echo "Starting application..."
-exec uvicorn app.main:app --host 0.0.0.0 --port 8000
