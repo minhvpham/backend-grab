@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Form
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from pathlib import Path
 from app.db.base import get_db
 from app.schemas.restaurant import RestaurantCreate, RestaurantUpdate, RestaurantResponse
 from app.crud import restaurant as crud
@@ -202,3 +204,69 @@ def delete_restaurant(
             detail=f"Restaurant with id {restaurant_id} not found"
         )
     return None
+
+
+@router.get("/{restaurant_id}/business-license-image")
+def get_business_license_image(
+    restaurant_id: int,
+    db: Session = Depends(get_db)
+):
+    """
+    Get the business license image for a restaurant.
+    
+    Returns the actual image file.
+    """
+    db_restaurant = crud.get_restaurant(db, restaurant_id)
+    if not db_restaurant:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Restaurant with id {restaurant_id} not found"
+        )
+    
+    if not db_restaurant.business_license_image:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Business license image not found for this restaurant"
+        )
+    
+    image_path = Path(db_restaurant.business_license_image)
+    if not image_path.exists():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Business license image file not found on server"
+        )
+    
+    return FileResponse(image_path)
+
+
+@router.get("/{restaurant_id}/food-safety-certificate-image")
+def get_food_safety_certificate_image(
+    restaurant_id: int,
+    db: Session = Depends(get_db)
+):
+    """
+    Get the food safety certificate image for a restaurant.
+    
+    Returns the actual image file.
+    """
+    db_restaurant = crud.get_restaurant(db, restaurant_id)
+    if not db_restaurant:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Restaurant with id {restaurant_id} not found"
+        )
+    
+    if not db_restaurant.food_safety_certificate_image:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Food safety certificate image not found for this restaurant"
+        )
+    
+    image_path = Path(db_restaurant.food_safety_certificate_image)
+    if not image_path.exists():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Food safety certificate image file not found on server"
+        )
+    
+    return FileResponse(image_path)
