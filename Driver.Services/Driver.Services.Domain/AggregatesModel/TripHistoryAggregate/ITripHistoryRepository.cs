@@ -20,6 +20,7 @@ public interface ITripHistoryRepository : IRepository<TripHistory>
     Task<IReadOnlyList<TripHistory>> GetTripsByStatusAsync(
         TripStatus status,
         CancellationToken cancellationToken = default);
+    Task<IQueryable<TripHistory>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<int> GetTotalTripsCountAsync(
         string driverId,
         CancellationToken cancellationToken = default);

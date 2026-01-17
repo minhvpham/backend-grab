@@ -4,6 +4,7 @@ using Driver.Services.Application.TripHistories.Commands.CreateTrip;
 using Driver.Services.Application.TripHistories.Commands.UpdateTripStatus;
 using Driver.Services.Application.TripHistories.Queries.GetDriverTrips;
 using Driver.Services.Application.TripHistories.Queries.GetTripById;
+using Driver.Services.Application.TripHistories.Queries.GetTrips;
 using Driver.Services.Domain.AggregatesModel.TripHistoryAggregate;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -67,6 +68,27 @@ public class TripsController : ControllerBase
         CancellationToken cancellationToken = default)
     {
         var query = new GetDriverTripsQuery(driverId, activeOnly, pageNumber, pageSize);
+        var result = await _mediator.Send(query, cancellationToken);
+
+        if (result.IsFailure)
+            return BadRequest(new { error = result.Error.Message });
+
+        return Ok(result.Value);
+    }
+
+    /// <summary>
+    /// Get list of trips with optional filters
+    /// </summary>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetTrips(
+        [FromQuery] TripStatus? status = null,
+        [FromQuery] string? searchTerm = null,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new GetTripsQuery(pageNumber, pageSize, status, searchTerm);
         var result = await _mediator.Send(query, cancellationToken);
 
         if (result.IsFailure)

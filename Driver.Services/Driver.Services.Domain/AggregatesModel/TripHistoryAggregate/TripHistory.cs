@@ -1,11 +1,14 @@
 using Driver.Services.Domain.Abstractions;
+using Driver.Services.Domain.AggregatesModel.DriverAggregate;
 using Driver.Services.Domain.Exceptions;
+using DriverEntity = Driver.Services.Domain.AggregatesModel.DriverAggregate.Driver;
 
 namespace Driver.Services.Domain.AggregatesModel.TripHistoryAggregate;
 
 public class TripHistory : Entity<string>, IAggregateRoot
 {
     public string DriverId { get; private set; } = string.Empty;
+    public DriverEntity? Driver { get; private set; }
     public string OrderId { get; private set; }
     public TripStatus Status { get; private set; }
     
