@@ -4,5 +4,6 @@ namespace Driver.Services.Application.Common.ExternalServices;
 
 public interface IOrderServiceClient
 {
-    Task<Result> UpdateOrderStatusAsync(string orderId, string status);
+    Task<Result> UpdateOrderStatusAsync(string orderId, string status, string driverId);
 }
+

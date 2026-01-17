@@ -18,7 +18,8 @@ public class CompleteTripCommandHandler : IRequestHandler<CompleteTripCommand, R
         ITripHistoryRepository tripRepository,
         IDriverRepository driverRepository,
         IUnitOfWork unitOfWork,
-        IOrderServiceClient orderServiceClient)
+        IOrderServiceClient orderServiceClient
+    )
     {
         _tripRepository = tripRepository;
         _driverRepository = driverRepository;
@@ -26,43 +27,56 @@ public class CompleteTripCommandHandler : IRequestHandler<CompleteTripCommand, R
         _orderServiceClient = orderServiceClient;
     }
 
-    public async Task<Result> Handle(CompleteTripCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(
+        CompleteTripCommand request,
+        CancellationToken cancellationToken
+    )
     {
         var trip = await _tripRepository.GetByIdAsync(request.TripId, cancellationToken);
-        
+
         if (trip == null)
         {
             return Result.Failure(
-                Error.NotFound("Trip.NotFound", $"Trip with ID '{request.TripId}' not found."));
+                Error.NotFound("Trip.NotFound", $"Trip with ID '{request.TripId}' not found.")
+            );
         }
 
         var driver = await _driverRepository.GetByIdAsync(trip.DriverId, cancellationToken);
         if (driver == null)
         {
-            return Result.Failure(Error.NotFound("Driver.NotFound", $"Driver with ID '{trip.DriverId}' not found."));
+            return Result.Failure(
+                Error.NotFound("Driver.NotFound", $"Driver with ID '{trip.DriverId}' not found.")
+            );
         }
 
         try
         {
             trip.CompleteDelivery(request.CashCollected, request.DriverNotes);
-            
+
             // Call Order.Service to update status
-            var orderResult = await _orderServiceClient.UpdateOrderStatusAsync(trip.OrderId, "delivered");
+            var orderResult = await _orderServiceClient.UpdateOrderStatusAsync(
+                trip.OrderId,
+                "delivered",
+                driver.Id
+            );
             if (orderResult.IsFailure)
             {
                 // Rollback: don't save trip changes
-                return Result.Failure(Error.Failure("OrderService.UpdateFailed", 
-                    $"Failed to update order status: {orderResult.Error.Message}"));
+                return Result.Failure(
+                    Error.Failure(
+                        "OrderService.UpdateFailed",
+                        $"Failed to update order status: {orderResult.Error.Message}"
+                    )
+                );
             }
-            
+
             driver.MarkAsAvailable();
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }
         catch (Exception ex)
         {
-            return Result.Failure(
-                Error.Validation("Trip.CompleteFailed", ex.Message));
+            return Result.Failure(Error.Validation("Trip.CompleteFailed", ex.Message));
         }
     }
 }

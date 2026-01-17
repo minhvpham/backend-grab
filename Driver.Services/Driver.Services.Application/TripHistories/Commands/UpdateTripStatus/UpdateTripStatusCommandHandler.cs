@@ -1,5 +1,6 @@
 using Driver.Services.Application.Common.ExternalServices;
 using Driver.Services.Application.Common.Models;
+using Driver.Services.Application.TripHistories.Commands.CreateTrip;
 using Driver.Services.Domain.Abstractions;
 using Driver.Services.Domain.AggregatesModel.DriverAggregate;
 using Driver.Services.Domain.AggregatesModel.TripHistoryAggregate;
@@ -13,27 +14,35 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
     private readonly IDriverRepository _driverRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IOrderServiceClient _orderServiceClient;
+    private readonly IMediator _mediator;
 
     public UpdateTripStatusCommandHandler(
         ITripHistoryRepository tripRepository,
         IDriverRepository driverRepository,
         IUnitOfWork unitOfWork,
-        IOrderServiceClient orderServiceClient)
+        IOrderServiceClient orderServiceClient,
+        IMediator mediator
+    )
     {
         _tripRepository = tripRepository;
         _driverRepository = driverRepository;
         _unitOfWork = unitOfWork;
         _orderServiceClient = orderServiceClient;
+        _mediator = mediator;
     }
 
-    public async Task<Result> Handle(UpdateTripStatusCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(
+        UpdateTripStatusCommand request,
+        CancellationToken cancellationToken
+    )
     {
         var trip = await _tripRepository.GetByIdAsync(request.TripId, cancellationToken);
-        
+
         if (trip == null)
         {
             return Result.Failure(
-                Error.NotFound("Trip.NotFound", $"Trip with ID '{request.TripId}' not found."));
+                Error.NotFound("Trip.NotFound", $"Trip with ID '{request.TripId}' not found.")
+            );
         }
 
         try
@@ -42,7 +51,12 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
             var driver = await _driverRepository.GetByIdAsync(trip.DriverId, cancellationToken);
             if (driver == null)
             {
-                return Result.Failure(Error.NotFound("Driver.NotFound", $"Driver with ID '{trip.DriverId}' not found."));
+                return Result.Failure(
+                    Error.NotFound(
+                        "Driver.NotFound",
+                        $"Driver with ID '{trip.DriverId}' not found."
+                    )
+                );
             }
 
             // Call domain method based on status
@@ -53,37 +67,66 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
                     orderStatusUpdate = "delivering";
                     driver.MarkAsBusy();
                     break;
-                    
+
                 case TripStatus.Rejected:
                     trip.Reject();
-                    orderStatusUpdate = "cancelled";
                     driver.MarkAsAvailable();
+                    // Order status remains "delivering"
+                    // Find another driver
+                    var command = new CreateTripCommand(
+                        trip.OrderId,
+                        trip.PickupAddress,
+                        trip.PickupLatitude,
+                        trip.PickupLongitude,
+                        trip.DeliveryAddress,
+                        trip.DeliveryLatitude,
+                        trip.DeliveryLongitude,
+                        trip.Fare,
+                        trip.CustomerNotes
+                    );
+                    var createResult = await _mediator.Send(command, cancellationToken);
+                    if (createResult.IsFailure)
+                    {
+                        orderStatusUpdate = "all_driver_rejected";
+                    }
                     break;
-                    
+
                 case TripStatus.PickedUp:
                     trip.MarkAsPickedUp();
                     // Order status remains "delivering"
                     break;
-                    
+
                 case TripStatus.InTransit:
                     trip.StartDelivery();
                     // Order status remains "delivering"
                     break;
-                    
+
                 default:
                     return Result.Failure(
-                        Error.Validation("Trip.InvalidStatus", $"Status transition to {request.Status} not supported via this endpoint"));
+                        Error.Validation(
+                            "Trip.InvalidStatus",
+                            $"Status transition to {request.Status} not supported via this endpoint"
+                        )
+                    );
             }
 
             // Call Order.Service if needed
             if (orderStatusUpdate != null)
             {
-                var orderResult = await _orderServiceClient.UpdateOrderStatusAsync(trip.OrderId, orderStatusUpdate);
+                var orderResult = await _orderServiceClient.UpdateOrderStatusAsync(
+                    trip.OrderId,
+                    orderStatusUpdate,
+                    driver.Id
+                );
                 if (orderResult.IsFailure)
                 {
                     // Rollback: don't save trip changes
-                    return Result.Failure(Error.Failure("OrderService.UpdateFailed", 
-                        $"Failed to update order status: {orderResult.Error.Message}"));
+                    return Result.Failure(
+                        Error.Failure(
+                            "OrderService.UpdateFailed",
+                            $"Failed to update order status: {orderResult.Error.Message}"
+                        )
+                    );
                 }
             }
 
@@ -92,8 +135,7 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
         }
         catch (Exception ex)
         {
-            return Result.Failure(
-                Error.Validation("Trip.UpdateStatusFailed", ex.Message));
+            return Result.Failure(Error.Validation("Trip.UpdateStatusFailed", ex.Message));
         }
     }
 }
