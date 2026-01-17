@@ -7,14 +7,16 @@ using MediatR;
 
 namespace Driver.Services.Application.DriverLocations.Queries.GetNearbyDrivers;
 
-public class GetNearbyDriversQueryHandler : IRequestHandler<GetNearbyDriversQuery, Result<List<NearbyDriverDto>>>
+public class GetNearbyDriversQueryHandler
+    : IRequestHandler<GetNearbyDriversQuery, Result<List<NearbyDriverDto>>>
 {
     private readonly IDriverLocationRepository _driverLocationRepository;
     private readonly IDriverRepository _driverRepository;
 
     public GetNearbyDriversQueryHandler(
         IDriverLocationRepository driverLocationRepository,
-        IDriverRepository driverRepository)
+        IDriverRepository driverRepository
+    )
     {
         _driverLocationRepository = driverLocationRepository;
         _driverRepository = driverRepository;
@@ -22,37 +24,55 @@ public class GetNearbyDriversQueryHandler : IRequestHandler<GetNearbyDriversQuer
 
     public async Task<Result<List<NearbyDriverDto>>> Handle(
         GetNearbyDriversQuery request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         // Get nearby driver locations
         var nearbyLocations = await _driverLocationRepository.GetNearbyDriverLocationsAsync(
             request.Latitude,
             request.Longitude,
             request.RadiusInKm,
-            cancellationToken);
+            cancellationToken
+        );
 
         // Get driver details for each location
         var nearbyDrivers = new List<NearbyDriverDto>();
-        
-        foreach (var location in nearbyLocations.Take(request.MaxResults))
+
+        // foreach (var location in nearbyLocations.Take(request.MaxResults))
+        // {
+        //     var driver = await _driverRepository.GetByIdAsync(location.DriverId, cancellationToken);
+        //     if (driver != null && driver.Status == DriverStatus.Online)
+        //     {
+        //         var distance = location.DistanceTo(
+        //             request.Latitude,
+        //             request.Longitude);
+        //
+        //         var nearbyDriver = location.ToNearbyDriverDto(
+        //             driver.FullName,
+        //             driver.ProfileImageUrl,
+        //             driver.Status.ToString(),
+        //             distance);
+        //
+        //         nearbyDrivers.Add(nearbyDriver);
+        //     }
+        // }
+
+        var drivers = await _driverRepository.GetAllAsync(cancellationToken);
+        foreach (var driver in drivers.Take(request.MaxResults))
         {
-            var driver = await _driverRepository.GetByIdAsync(location.DriverId, cancellationToken);
-            if (driver != null && driver.Status == DriverStatus.Online)
+            var nearbyDriver = new NearbyDriverDto
             {
-                var distance = location.DistanceTo(
-                    request.Latitude,
-                    request.Longitude);
+                DriverId = driver.Id,
+                FullName = driver.FullName,
+                ProfileImageUrl = driver.ProfileImageUrl,
+                Status = driver.Status.ToString(),
+                DistanceInKm = 3.2,
+                Latitude = 10,
+                Longitude = 10,
+            };
 
-                var nearbyDriver = location.ToNearbyDriverDto(
-                    driver.FullName,
-                    driver.ProfileImageUrl,
-                    driver.Status.ToString(),
-                    distance);
-
-                nearbyDrivers.Add(nearbyDriver);
-            }
+            nearbyDrivers.Add(nearbyDriver);
         }
-
         return Result.Success(nearbyDrivers);
     }
 }
