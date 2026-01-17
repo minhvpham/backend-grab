@@ -199,7 +199,7 @@ def read_restaurant_orders(
 
 # Assign driver to order
 @router.post("/{order_id}/assign-driver", response_model=schemas.OrderSingleResponse)
-def assign_driver_to_order(
+async def assign_driver_to_order(
     order_id: str, 
     driver_id: str = Query(..., description="ID của driver"),
     db: Session = Depends(get_db)

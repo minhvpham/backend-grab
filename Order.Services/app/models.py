@@ -51,7 +51,8 @@ class Profile(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationship to orders
-    orders = relationship("Order", back_populates="profile")
+    # Relationship to orders
+    # orders = relationship("Order", back_populates="profile")
 
     def __repr__(self):
         return f"<Profile(user_id={self.user_id}, name={self.name}, email={self.email})>"
@@ -62,7 +63,7 @@ class Order(Base):
     __tablename__ = "orders"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(String(255), ForeignKey("profiles.user_id"), nullable=False, index=True)  # FK to Profile
+    user_id = Column(String(255), nullable=False, index=True)  # FK to Profile (Removed constraint)
     restaurant_id = Column(String(255), nullable=False, index=True)  # FK to Restaurant service
     driver_id = Column(String(255), nullable=True, index=True)  # FK to Driver service
     
@@ -82,7 +83,8 @@ class Order(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
-    profile = relationship("Profile", back_populates="orders")
+    # Relationships
+    # profile = relationship("Profile", back_populates="orders")
     items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
 
     def __repr__(self):
