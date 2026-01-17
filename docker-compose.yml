@@ -13,10 +13,9 @@ services:
       - "5432:5432" # Use standard port 5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      # Only create databases, let services handle schema with migrations
-      - ./init-united-db.sql:/docker-entrypoint-initdb.d/00-create-databases.sql
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -86,6 +85,7 @@ services:
 
 volumes:
   postgres_data:
+
 
 networks:
   default:
