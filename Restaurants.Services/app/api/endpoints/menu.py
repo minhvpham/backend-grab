@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Form
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from decimal import Decimal
+from pathlib import Path
 from app.db.base import get_db
 from app.schemas.menu import (
     CategoryCreate, CategoryUpdate, CategoryResponse,
@@ -193,6 +195,35 @@ def list_dishes(
     )
 
 
+@router.get("/dishes", response_model=List[MenuItemResponse])
+def list_all_dishes(
+    category_id: Optional[int] = Query(None, description="Filter by category"),
+    available_only: bool = Query(False, description="Show only available items"),
+    skip: int = Query(0, ge=0, description="Number of records to skip"),
+    limit: int = Query(100, ge=1, le=500, description="Maximum number of records to return"),
+    db: Session = Depends(get_db)
+):
+    """
+    Get all menu items from all restaurants with optional filters.
+    
+    **Query Parameters:**
+    - **category_id** (optional): Filter by specific category
+    - **available_only** (optional): Only show items that are in stock (default: false)
+    - **skip** (optional): Number of records to skip for pagination (default: 0)
+    - **limit** (optional): Maximum number of records to return (default: 100, max: 500)
+    
+    **Returns:**
+    List of dishes from all restaurants
+    """
+    return crud_menu.get_all_dishes(
+        db,
+        category_id=category_id,
+        available_only=available_only,
+        skip=skip,
+        limit=limit
+    )
+
+
 @router.get("/categories/{category_id}/dishes", response_model=List[MenuItemResponse])
 def list_dishes_by_category(
     category_id: int,
@@ -313,3 +344,44 @@ def get_dish_stats(
         "dish_name": db_dish.name,
         "total_sold": quantity
     }
+
+
+@router.get("/restaurants/{restaurant_id}/dishes/{dish_id}/image")
+def get_dish_image(
+    restaurant_id: int,
+    dish_id: int,
+    db: Session = Depends(get_db)
+):
+    """
+    Get the image for a specific dish.
+    
+    Returns the actual image file.
+    """
+    db_dish = crud_menu.get_dish(db, dish_id)
+    if not db_dish:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Dish with id {dish_id} not found"
+        )
+    
+    # Verify dish belongs to the restaurant
+    if db_dish.restaurant_id != restaurant_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Dish with id {dish_id} not found in restaurant {restaurant_id}"
+        )
+    
+    if not db_dish.image_url:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Image not found for this dish"
+        )
+    
+    image_path = Path(db_dish.image_url)
+    if not image_path.exists():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Image file not found on server"
+        )
+    
+    return FileResponse(image_path)

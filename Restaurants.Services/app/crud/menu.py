@@ -98,6 +98,34 @@ def get_dishes_by_restaurant(
     return query.all()
 
 
+def get_all_dishes(
+    db: Session,
+    category_id: Optional[int] = None,
+    available_only: bool = False,
+    skip: int = 0,
+    limit: int = 100
+) -> List[MenuItem]:
+    """
+    Get all menu items from all restaurants with optional filters
+    
+    Args:
+        db: Database session
+        category_id: Optional filter by category
+        available_only: If True, only return available items
+        skip: Number of records to skip for pagination
+        limit: Maximum number of records to return
+    """
+    query = db.query(MenuItem)
+    
+    if category_id is not None:
+        query = query.filter(MenuItem.category_id == category_id)
+    
+    if available_only:
+        query = query.filter(MenuItem.is_available == True)
+    
+    return query.offset(skip).limit(limit).all()
+
+
 def get_dishes_by_category(db: Session, category_id: int) -> List[MenuItem]:
     """Get all menu items in a category"""
     return db.query(MenuItem).filter(MenuItem.category_id == category_id).all()
