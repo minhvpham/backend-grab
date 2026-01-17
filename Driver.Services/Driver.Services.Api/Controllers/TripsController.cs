@@ -56,39 +56,19 @@ public class TripsController : ControllerBase
     }
 
     /// <summary>
-    /// Get driver's trips
+    /// Get driver's trips with optional filters
     /// </summary>
     [HttpGet("driver/{driverId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetDriverTrips(
         string driverId,
-        [FromQuery] bool activeOnly = false,
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 20,
-        CancellationToken cancellationToken = default)
-    {
-        var query = new GetDriverTripsQuery(driverId, activeOnly, pageNumber, pageSize);
-        var result = await _mediator.Send(query, cancellationToken);
-
-        if (result.IsFailure)
-            return BadRequest(new { error = result.Error.Message });
-
-        return Ok(result.Value);
-    }
-
-    /// <summary>
-    /// Get list of trips with optional filters
-    /// </summary>
-    [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetTrips(
         [FromQuery] TripStatus? status = null,
         [FromQuery] string? searchTerm = null,
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 20,
         CancellationToken cancellationToken = default)
     {
-        var query = new GetTripsQuery(pageNumber, pageSize, status, searchTerm);
+        var query = new GetTripsQuery(driverId, pageNumber, pageSize, status, searchTerm);
         var result = await _mediator.Send(query, cancellationToken);
 
         if (result.IsFailure)

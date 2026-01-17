@@ -3,7 +3,6 @@ using Driver.Services.Application.TripHistories.DTOs;
 using Driver.Services.Application.TripHistories.Mappings;
 using Driver.Services.Domain.AggregatesModel.TripHistoryAggregate;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Driver.Services.Application.TripHistories.Queries.GetTrips;
 
@@ -21,9 +20,8 @@ public class GetTripsQueryHandler : IRequestHandler<GetTripsQuery, Result<Pagina
         // Get all trips as queryable
         var tripsQuery = await _tripRepository.GetAllAsync(cancellationToken);
 
-        // Include driver navigation and apply filters
-        tripsQuery = tripsQuery
-            .Include(th => th.Driver);
+        // Filter by driver ID first
+        tripsQuery = tripsQuery.Where(th => th.DriverId == request.DriverId);
 
         if (request.Status.HasValue)
         {
@@ -34,7 +32,7 @@ public class GetTripsQueryHandler : IRequestHandler<GetTripsQuery, Result<Pagina
         {
             var searchTerm = request.SearchTerm.ToLower();
             tripsQuery = tripsQuery.Where(th =>
-                th.Driver != null && th.Driver.FullName.ToLower().Contains(searchTerm));
+                th.CustomerNotes != null && th.CustomerNotes.ToLower().Contains(searchTerm));
         }
 
         // Order by assigned date descending

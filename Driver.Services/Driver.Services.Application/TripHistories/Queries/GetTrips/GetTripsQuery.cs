@@ -6,6 +6,7 @@ using MediatR;
 namespace Driver.Services.Application.TripHistories.Queries.GetTrips;
 
 public record GetTripsQuery(
+    string DriverId,
     int PageNumber = 1,
     int PageSize = 20,
     TripStatus? Status = null,

@@ -45,7 +45,6 @@ public static class TripHistoryMappings
         {
             Id = trip.Id,
             OrderId = trip.OrderId,
-            DriverName = trip.Driver?.FullName ?? "Unknown Driver",
             Status = trip.Status.ToString(),
             PickupAddress = trip.PickupAddress,
             DeliveryAddress = trip.DeliveryAddress,

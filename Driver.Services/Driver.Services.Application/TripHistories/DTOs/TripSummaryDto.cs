@@ -4,7 +4,6 @@ public class TripSummaryDto
 {
     public string Id { get; set; } = string.Empty;
     public string OrderId { get; set; } = default!;
-    public string DriverName { get; set; } = default!;
     public string Status { get; set; } = default!;
     public string PickupAddress { get; set; } = default!;
     public string DeliveryAddress { get; set; } = default!;
