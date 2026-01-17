@@ -1,41 +1,41 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from decimal import Decimal
 from app.db.base import get_db
 from app.schemas.menu import (
     CategoryCreate, CategoryUpdate, CategoryResponse,
     MenuItemCreate, MenuItemUpdate, MenuItemResponse
 )
 from app.crud import menu as crud_menu
+from app.utils import save_dish_image
 
 router = APIRouter()
 
 
 # ==================== CATEGORY ENDPOINTS ====================
 
-@router.post("/restaurants/{restaurant_id}/categories", response_model=CategoryResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/categories", response_model=CategoryResponse, status_code=status.HTTP_201_CREATED)
 def create_category(
-    restaurant_id: int, 
     category: CategoryCreate, 
     db: Session = Depends(get_db)
 ):
     """
-    Create a new category for a restaurant.
+    Create a new global category.
     
-    Categories help organize menu items (e.g., "Appetizers", "Main Courses", "Drinks").
+    Categories are shared across all restaurants (e.g., "Đại hạ giá", "Ăn vặt", "Ăn trưa", "Đồ uống").
     """
-    return crud_menu.create_category(db, category, restaurant_id)
+    return crud_menu.create_category(db, category)
 
 
-@router.get("/restaurants/{restaurant_id}/categories", response_model=List[CategoryResponse])
-def list_categories(
-    restaurant_id: int,
+@router.get("/categories", response_model=List[CategoryResponse])
+def list_all_categories(
     db: Session = Depends(get_db)
 ):
     """
-    Get all categories for a specific restaurant.
+    Get all global categories available for all restaurants.
     """
-    return crud_menu.get_categories_by_restaurant(db, restaurant_id)
+    return crud_menu.get_all_categories(db)
 
 
 @router.get("/categories/{category_id}", response_model=CategoryResponse)
@@ -62,7 +62,7 @@ def update_category(
     db: Session = Depends(get_db)
 ):
     """
-    Update a category.
+    Update a global category.
     """
     db_category = crud_menu.update_category(db, category_id, category)
     if not db_category:
@@ -79,7 +79,7 @@ def delete_category(
     db: Session = Depends(get_db)
 ):
     """
-    Delete a category.
+    Delete a global category.
     
     **Warning:** This will also affect menu items linked to this category.
     """
@@ -95,22 +95,81 @@ def delete_category(
 # ==================== MENU ITEM (DISH) ENDPOINTS ====================
 
 @router.post("/restaurants/{restaurant_id}/dishes", response_model=MenuItemResponse, status_code=status.HTTP_201_CREATED)
-def create_dish(
-    restaurant_id: int, 
-    dish: MenuItemCreate, 
+async def create_dish(
+    restaurant_id: int,
+    name: str = Form(...),
+    price: Decimal = Form(...),
+    discounted_price: Optional[Decimal] = Form(None),
+    description: Optional[str] = Form(None),
+    category_id: Optional[int] = Form(None),
+    is_available: bool = Form(True),
+    stock_quantity: Optional[int] = Form(None),
+    image: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
     """
-    Create a new menu item (dish) for a restaurant.
+    Create a new menu item (dish) for a restaurant with image upload.
     
+    **Request (multipart/form-data):**
+    - **name** (required): Dish name
+    - **price** (required): Original price
+    - **discounted_price** (optional): Price after discount
+    - **description** (optional): Dish description
+    - **category_id** (optional): Category assignment
+    - **image** (optional): Dish image file (jpg, jpeg, png, gif, bmp, webp)
+    - **is_available** (optional): Stock status (default: true)
+    - **stock_quantity** (optional): Stock quantity
+    
+    **Returns:**
+    - **id**: Dish ID
+    - **restaurant_id**: Restaurant ID
     - **name**: Dish name
-    - **description**: Optional description
-    - **price**: Price in your currency
-    - **category_id**: Optional category assignment
-    - **image_url**: Optional image URL
-    - **is_available**: Stock status (default: true)
+    - **price**: Original price
+    - **discounted_price**: Discounted price (if set)
+    - **description**: Description
+    - **category_id**: Category ID
+    - **image_url**: Image path (accessible via /uploads/dish_images/xxx.jpg)
+    - **is_available**: Availability status
+    - **stock_quantity**: Stock quantity
     """
-    return crud_menu.create_dish(db, dish, restaurant_id)
+    try:
+        # Save uploaded image if provided
+        image_url = None
+        if image and image.filename:
+            image_url = await save_dish_image(image)
+        
+        # Create dish data
+        dish_data = MenuItemCreate(
+            name=name,
+            description=description,
+            price=price,
+            discounted_price=discounted_price,
+            category_id=category_id,
+            is_available=is_available,
+            stock_quantity=stock_quantity
+        )
+        
+        # Create dish in database
+        db_dish = crud_menu.create_dish(db, dish_data, restaurant_id)
+        
+        # Update image_url if image was uploaded
+        if image_url:
+            db_dish.image_url = image_url
+            db.commit()
+            db.refresh(db_dish)
+        
+        return db_dish
+        
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error creating dish: {str(e)}"
+        )
 
 
 @router.get("/restaurants/{restaurant_id}/dishes", response_model=List[MenuItemResponse])

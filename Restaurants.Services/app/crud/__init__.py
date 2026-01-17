@@ -9,7 +9,7 @@ from app.crud.restaurant import (
 from app.crud.menu import (
     create_category,
     get_category,
-    get_categories_by_restaurant,
+    get_all_categories,
     update_category,
     delete_category,
     create_dish,
@@ -31,7 +31,7 @@ __all__ = [
     "get_restaurants_by_owner",
     "create_category",
     "get_category",
-    "get_categories_by_restaurant",
+    "get_all_categories",
     "update_category",
     "delete_category",
     "create_dish",

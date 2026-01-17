@@ -7,6 +7,7 @@ from fastapi import UploadFile
 UPLOAD_DIR = Path("uploads")
 BUSINESS_LICENSE_DIR = UPLOAD_DIR / "business_licenses"
 FOOD_SAFETY_CERT_DIR = UPLOAD_DIR / "food_safety_certificates"
+DISH_IMAGES_DIR = UPLOAD_DIR / "dish_images"
 
 # Allowed image extensions
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"}
@@ -16,6 +17,7 @@ def ensure_upload_directories():
     """Create upload directories if they don't exist"""
     BUSINESS_LICENSE_DIR.mkdir(parents=True, exist_ok=True)
     FOOD_SAFETY_CERT_DIR.mkdir(parents=True, exist_ok=True)
+    DISH_IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def is_allowed_image(filename: str) -> bool:
@@ -72,6 +74,11 @@ async def save_business_license(upload_file: UploadFile) -> str:
 async def save_food_safety_certificate(upload_file: UploadFile) -> str:
     """Save food safety certificate image and return its path"""
     return await save_upload_file(upload_file, FOOD_SAFETY_CERT_DIR)
+
+
+async def save_dish_image(upload_file: UploadFile) -> str:
+    """Save dish image and return its path"""
+    return await save_upload_file(upload_file, DISH_IMAGES_DIR)
 
 
 def delete_file(file_path: str) -> bool:
