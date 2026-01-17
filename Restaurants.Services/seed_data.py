@@ -1,72 +1,55 @@
 """
 Seed script to create initial test data in the database.
-Run this after running migrations to create test users.
+Run this after running migrations to seed default global categories.
 """
 from app.db.base import SessionLocal
-from app.models.auth import User, RoleEnum
+from app.models.menu import Category
 from sqlalchemy.exc import IntegrityError
 
 
-def create_test_users():
-    """Create test users for development"""
+def seed_default_categories():
+    """Create default global categories"""
     db = SessionLocal()
     
-    test_users = [
-        {
-            "id": 1,
-            "email": "seller1@example.com",
-            "hashed_password": "hashed_password_placeholder",  # In production, hash this properly
-            "role": RoleEnum.seller,
-            "is_active": True,
-            "is_deleted": False
-        },
-        {
-            "id": 2,
-            "email": "seller2@example.com",
-            "hashed_password": "hashed_password_placeholder",
-            "role": RoleEnum.seller,
-            "is_active": True,
-            "is_deleted": False
-        },
-        {
-            "id": 3,
-            "email": "admin@example.com",
-            "hashed_password": "hashed_password_placeholder",
-            "role": RoleEnum.admin,
-            "is_active": True,
-            "is_deleted": False
-        },
-        {
-            "id": 4,
-            "email": "user@example.com",
-            "hashed_password": "hashed_password_placeholder",
-            "role": RoleEnum.user,
-            "is_active": True,
-            "is_deleted": False
-        }
+    # Default categories shared across all restaurants
+    default_categories = [
+        {"name": "Đại hạ giá"},
+        {"name": "Ăn vặt"},
+        {"name": "Ăn trưa"},
+        {"name": "Đồ uống"},
     ]
     
     created_count = 0
-    for user_data in test_users:
+    
+    for category_data in default_categories:
         try:
-            user = User(**user_data)
-            db.add(user)
-            db.commit()
-            db.refresh(user)
-            print(f"✓ Created user: {user.email} (ID: {user.id}, Role: {user.role})")
-            created_count += 1
+            # Check if already exists
+            existing = db.query(Category).filter(
+                Category.name == category_data["name"]
+            ).first()
+            
+            if not existing:
+                category = Category(**category_data)
+                db.add(category)
+                db.commit()
+                db.refresh(category)
+                print(f"✓ Created category: {category.name} (ID: {category.id})")
+                created_count += 1
+            else:
+                print(f"✓ Category '{category_data['name']}' already exists")
         except IntegrityError:
             db.rollback()
-            print(f"✗ User {user_data['email']} already exists, skipping...")
+            print(f"✗ Category '{category_data['name']}' already exists, skipping...")
         except Exception as e:
             db.rollback()
-            print(f"✗ Error creating user {user_data['email']}: {e}")
+            print(f"✗ Error creating category {category_data['name']}: {e}")
     
     db.close()
-    print(f"\n✓ Seed completed! Created {created_count} new users.")
+    print(f"\n✓ Seed completed! Created {created_count} new categories.")
+    print("Global categories ready: Đại hạ giá, Ăn vặt, Ăn trưa, Đồ uống")
 
 
 if __name__ == "__main__":
     print("Starting database seeding...\n")
-    create_test_users()
-    print("\nYou can now create restaurants with owner_id=1 (seller1@example.com)")
+    seed_default_categories()
+    print("\nGlobal categories are ready to be used by all restaurants.")

@@ -12,9 +12,9 @@ from app.schemas.menu import (
 
 # ==================== CATEGORY CRUD ====================
 
-def create_category(db: Session, category: CategoryCreate, restaurant_id: int) -> Category:
-    """Create a new category for a restaurant"""
-    db_obj = Category(**category.model_dump(), restaurant_id=restaurant_id)
+def create_category(db: Session, category: CategoryCreate) -> Category:
+    """Create a new global category"""
+    db_obj = Category(**category.model_dump())
     db.add(db_obj)
     db.commit()
     db.refresh(db_obj)
@@ -26,9 +26,9 @@ def get_category(db: Session, category_id: int) -> Optional[Category]:
     return db.query(Category).filter(Category.id == category_id).first()
 
 
-def get_categories_by_restaurant(db: Session, restaurant_id: int) -> List[Category]:
-    """Get all categories for a restaurant"""
-    return db.query(Category).filter(Category.restaurant_id == restaurant_id).all()
+def get_all_categories(db: Session) -> List[Category]:
+    """Get all global categories"""
+    return db.query(Category).all()
 
 
 def update_category(db: Session, category_id: int, category_update: CategoryUpdate) -> Optional[Category]:
