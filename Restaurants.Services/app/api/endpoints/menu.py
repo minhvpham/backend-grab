@@ -253,26 +253,85 @@ def get_dish(
 
 
 @router.put("/dishes/{dish_id}", response_model=MenuItemResponse)
-def update_dish(
-    dish_id: int, 
-    dish: MenuItemUpdate, 
+async def update_dish(
+    dish_id: int,
+    name: Optional[str] = Form(None),
+    price: Optional[Decimal] = Form(None),
+    discounted_price: Optional[Decimal] = Form(None),
+    description: Optional[str] = Form(None),
+    category_id: Optional[int] = Form(None),
+    is_available: Optional[bool] = Form(None),
+    stock_quantity: Optional[int] = Form(None),
+    image: UploadFile = File(None),
     db: Session = Depends(get_db)
 ):
     """
-    Update a menu item.
+    Update a menu item with all information including image.
     
-    Can be used to:
-    - Edit dish information (name, price, description)
-    - Toggle availability (is_available)
-    - Update stock quantity
+    **Request (multipart/form-data):**
+    - **name** (optional): Dish name
+    - **price** (optional): Original price
+    - **discounted_price** (optional): Price after discount
+    - **description** (optional): Dish description
+    - **category_id** (optional): Category assignment
+    - **image** (optional): New dish image file (jpg, jpeg, png, gif, bmp, webp)
+    - **is_available** (optional): Stock status
+    - **stock_quantity** (optional): Stock quantity
+    
+    **Returns:**
+    Updated dish information with all fields
     """
-    db_dish = crud_menu.update_dish(db, dish_id, dish)
-    if not db_dish:
+    try:
+        # Check if dish exists
+        db_dish = crud_menu.get_dish(db, dish_id)
+        if not db_dish:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Dish with id {dish_id} not found"
+            )
+        
+        # Save new image if provided
+        if image and image.filename:
+            # Delete old image if exists
+            if db_dish.image_url:
+                old_image_path = Path(db_dish.image_url)
+                if old_image_path.exists():
+                    old_image_path.unlink()
+            
+            # Save new image
+            new_image_url = await save_dish_image(image)
+            db_dish.image_url = new_image_url
+        
+        # Update other fields if provided
+        if name is not None:
+            db_dish.name = name
+        if price is not None:
+            db_dish.price = price
+        if discounted_price is not None:
+            db_dish.discounted_price = discounted_price
+        if description is not None:
+            db_dish.description = description
+        if category_id is not None:
+            db_dish.category_id = category_id
+        if is_available is not None:
+            db_dish.is_available = is_available
+        if stock_quantity is not None:
+            db_dish.stock_quantity = stock_quantity
+        
+        db.commit()
+        db.refresh(db_dish)
+        return db_dish
+        
+    except ValueError as e:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Dish with id {dish_id} not found"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
         )
-    return db_dish
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error updating dish: {str(e)}"
+        )
 
 
 @router.patch("/dishes/{dish_id}/toggle-availability", response_model=MenuItemResponse)
