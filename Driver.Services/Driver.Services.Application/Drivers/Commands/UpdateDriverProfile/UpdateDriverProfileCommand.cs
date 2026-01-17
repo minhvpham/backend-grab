@@ -6,5 +6,6 @@ namespace Driver.Services.Application.Drivers.Commands.UpdateDriverProfile;
 public record UpdateDriverProfileCommand(
     string DriverId,
     string FullName,
-    string Email
+    string Email,
+    string PhoneNumber
 ) : IRequest<Result>;

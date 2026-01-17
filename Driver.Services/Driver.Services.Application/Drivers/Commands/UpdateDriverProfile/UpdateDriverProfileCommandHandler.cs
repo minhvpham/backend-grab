@@ -42,7 +42,7 @@ public class UpdateDriverProfileCommandHandler : IRequestHandler<UpdateDriverPro
         // Update driver profile
         try
         {
-            driver.UpdateProfile(request.FullName, request.Email);
+            driver.UpdateProfile(request.FullName, request.Email, request.PhoneNumber);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }
