@@ -26,6 +26,11 @@ class OrderStatus(str, enum.Enum):
     DELIVERING = "delivering"
     DELIVERED = "delivered"
     CANCELLED = "cancelled"
+    PENDING_RESTAURANT = "pending_restaurant"
+    RESTAURANT_REJECTED = "restaurant_rejected"
+    RESTAURANT_ACCEPTED = "restaurant_accepted"
+    DRIVER_ACCEPTED = "driver_accepted"
+    DRIVER_REJECTED = "driver_rejected"
 
 
 class PaymentStatus(str, enum.Enum):
@@ -66,8 +71,8 @@ class Order(Base):
     user_id = Column(String(255), nullable=False, index=True)  # FK to Profile (Removed constraint)
     restaurant_id = Column(String(255), nullable=False, index=True)  # FK to Restaurant service
     driver_id = Column(String(255), nullable=True, index=True)  # FK to Driver service
-    
-    status = Column(String(30), default="pending", nullable=False)
+
+    status = Column(String(30), default="pending_restaurant", nullable=False)
     payment_status = Column(String(20), default="unpaid", nullable=False)
     payment_method = Column(String(50), nullable=True)
     

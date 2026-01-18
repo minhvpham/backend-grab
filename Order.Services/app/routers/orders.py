@@ -31,16 +31,31 @@ async def get_nearby_drivers(
 
 
 @router.post("/", response_model=schemas.OrderSingleResponse, status_code=201)
-def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
+async def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
     """
     Tạo đơn hàng mới
-    
+
     - **profile_id**: ID của profile đặt hàng
     - **restaurant_id**: ID của nhà hàng
     - **items**: Danh sách món ăn
     - **delivery_address**: Địa chỉ giao hàng
     """
     created_order = crud.create_order(db=db, order=order)
+
+    # Send restaurant evaluation request (fire-and-forget)
+    order_data = {
+        "user_id": order.user_id,
+        "restaurant_id": order.restaurant_id,
+        "items": [
+            {"product_id": item.product_id, "quantity": item.quantity}
+            for item in order.items
+        ],
+        "delivery_address": order.delivery_address,
+    }
+    await restaurant_service.evaluate_order(
+        str(created_order.id), order.restaurant_id, order_data
+    )
+
     return schemas.OrderSingleResponse(
         success=True,
         message="Tạo đơn hàng thành công",
@@ -85,16 +100,42 @@ def read_order(order_id: str, db: Session = Depends(get_db)):
 
 
 @router.put("/{order_id}", response_model=schemas.OrderSingleResponse)
-def update_order(order_id: str, order_update: schemas.OrderUpdate, db: Session = Depends(get_db)):
+async def update_order(
+    order_id: str, order_update: schemas.OrderUpdate, db: Session = Depends(get_db)
+):
     """
     Cập nhật đơn hàng (trạng thái, driver, địa chỉ...)
+    Status-driven endpoint that applies business logic based on status transitions.
     """
     db_order = crud.get_order(db, order_id=order_id)
     if db_order is None:
         raise HTTPException(status_code=404, detail="Đơn hàng không tồn tại")
-    
-    updated_order = crud.update_order(db=db, order_id=order_id, order_update=order_update)
-    
+
+    # Import here to avoid circular import issues
+    try:
+        from ..services.status_handler import StatusHandler
+    except ImportError:
+        # Fallback if import fails
+        StatusHandler = None
+
+    # Validate status transition if status is being updated
+    if order_update.status and StatusHandler:
+        handler = StatusHandler(db)
+        if not handler.validate_status_transition(db_order.status, order_update.status):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid status transition from {db_order.status} to {order_update.status.value}",
+            )
+
+    updated_order = crud.update_order(
+        db=db, order_id=order_id, order_update=order_update
+    )
+
+    # Apply status-driven logic if status was updated
+    if order_update.status and StatusHandler:
+        handler = StatusHandler(db)
+        await handler.handle_status_update(updated_order, order_update.status)
+
     return schemas.OrderSingleResponse(
         success=True,
         message="Cập nhật đơn hàng thành công",

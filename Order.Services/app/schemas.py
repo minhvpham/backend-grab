@@ -59,6 +59,11 @@ class OrderStatus(str, Enum):
     DELIVERING = "delivering"
     DELIVERED = "delivered"
     CANCELLED = "cancelled"
+    PENDING_RESTAURANT = "pending_restaurant"
+    RESTAURANT_REJECTED = "restaurant_rejected"
+    RESTAURANT_ACCEPTED = "restaurant_accepted"
+    DRIVER_ACCEPTED = "driver_accepted"
+    DRIVER_REJECTED = "driver_rejected"
 
 
 class PaymentStatus(str, Enum):

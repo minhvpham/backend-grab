@@ -186,6 +186,29 @@ class DriverServiceClient:
             print(f"Error creating trip: {e}")
             return None
 
+    async def initiate_driver_assignment(self, order_id: str) -> bool:
+        """
+        Initiate driver assignment process for an order.
+        This sends a request to Driver Service to start the assignment workflow.
+
+        Args:
+            order_id: ID of the order to assign
+
+        Returns:
+            True if request was sent successfully, False otherwise
+        """
+        try:
+            async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+                payload = {"order_id": order_id}
+                response = await client.post(
+                    f"{self.base_url}/api/orders/assign-driver", json=payload
+                )
+                response.raise_for_status()
+                return True
+        except httpx.HTTPError as e:
+            print(f"Error initiating driver assignment: {e}")
+            return False
+
 
 # Singleton instance
 driver_client = DriverServiceClient()
@@ -210,3 +233,8 @@ async def get_driver_gps(driver_id: str):
 async def assign_order_to_driver(driver_id: str, order_id: str, pickup: str, delivery: str):
     """Gán đơn hàng cho tài xế"""
     return await driver_client.create_trip(driver_id, order_id, pickup, delivery)
+
+
+async def initiate_driver_assignment(order_id: str) -> bool:
+    """Initiate driver assignment process for an order"""
+    return await driver_client.initiate_driver_assignment(order_id)

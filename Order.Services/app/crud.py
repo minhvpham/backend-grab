@@ -52,6 +52,7 @@ def create_order(db: Session, order: schemas.OrderCreate) -> models.Order:
     db_order = models.Order(
         user_id=order.user_id,
         restaurant_id=order.restaurant_id,
+        driver_id=None,  # Explicitly set to NULL
         delivery_address=order.delivery_address,
         delivery_note=order.delivery_note,
         payment_method=order.payment_method,
