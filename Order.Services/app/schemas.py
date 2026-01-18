@@ -8,6 +8,7 @@ from uuid import UUID
 
 # ========== Profile Enums & Schemas ==========
 
+
 class ProfileRole(str, Enum):
     USER = "user"
     SELLER = "seller"
@@ -49,6 +50,7 @@ class ProfileResponse(BaseModel):
 
 
 # ========== Order Enums & Schemas ==========
+
 
 class OrderStatus(str, Enum):
     PENDING = "pending"
@@ -92,8 +94,8 @@ class OrderItemResponse(BaseModel):
 
     class Config:
         from_attributes = True
-    
-    @field_serializer('id', 'product_id')
+
+    @field_serializer("id", "product_id")
     def serialize_uuid(self, v):
         return str(v) if v else None
 
@@ -103,6 +105,7 @@ class OrderCreate(BaseModel):
     user_id: str  # ID từ Auth Service
     restaurant_id: str
     delivery_address: str
+    discount: Decimal = Field(default=Decimal("0.0"), ge=0)
     delivery_note: Optional[str] = None
     payment_method: Optional[str] = None
     items: List[OrderItemCreate] = Field(..., min_length=1)
@@ -136,13 +139,14 @@ class OrderResponse(BaseModel):
 
     class Config:
         from_attributes = True
-    
-    @field_serializer('id', 'restaurant_id', 'driver_id')
+
+    @field_serializer("id", "restaurant_id", "driver_id")
     def serialize_uuid(self, v):
         return str(v) if v else None
 
 
 # ========== Response Wrappers ==========
+
 
 class ProfileListResponse(BaseModel):
     success: bool = True

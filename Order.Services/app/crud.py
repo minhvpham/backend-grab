@@ -56,6 +56,7 @@ def create_order(db: Session, order: schemas.OrderCreate) -> models.Order:
         delivery_address=order.delivery_address,
         delivery_note=order.delivery_note,
         payment_method=order.payment_method,
+        discount=order.discount,
         subtotal=subtotal,
         delivery_fee=delivery_fee,
         total_amount=total_amount
