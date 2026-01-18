@@ -25,20 +25,6 @@ async def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)
     """
     created_order = crud.create_order(db=db, order=order)
 
-    # Send restaurant evaluation request (fire-and-forget)
-    order_data = {
-        "user_id": order.user_id,
-        "restaurant_id": order.restaurant_id,
-        "items": [
-            {"product_id": item.product_id, "quantity": item.quantity}
-            for item in order.items
-        ],
-        "delivery_address": order.delivery_address,
-    }
-    await restaurant_service.evaluate_order(
-        str(created_order.id), order.restaurant_id, order_data
-    )
-
     return schemas.OrderSingleResponse(
         success=True,
         message="Tạo đơn hàng thành công",

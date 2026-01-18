@@ -35,35 +35,9 @@ class RestaurantServiceClient:
             print(f"Error getting restaurant info: {e}")
             return None
 
-    async def evaluate_order(
-        self, order_id: str, restaurant_id: str, order_data: Dict[str, Any]
-    ) -> bool:
-        """Send order evaluation request to restaurant service"""
-        try:
-            async with httpx.AsyncClient(timeout=TIMEOUT) as client:
-                payload = {
-                    "order_id": order_id,
-                    "restaurant_id": restaurant_id,
-                    "order_data": order_data,
-                }
-                response = await client.post(
-                    f"{self.base_url}/api/orders/evaluate", json=payload
-                )
-                response.raise_for_status()
-                return True
-        except httpx.HTTPError as e:
-            print(f"Error sending restaurant evaluation: {e}")
-            return False
 
 
 restaurant_client = RestaurantServiceClient()
 
 async def get_restaurant_details(restaurant_id: str) -> Optional[RestaurantInfo]:
     return await restaurant_client.get_restaurant_info(restaurant_id)
-
-
-async def evaluate_order(
-    order_id: str, restaurant_id: str, order_data: Dict[str, Any]
-) -> bool:
-    """Send order evaluation request to restaurant service"""
-    return await restaurant_client.evaluate_order(order_id, restaurant_id, order_data)
