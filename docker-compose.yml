@@ -51,6 +51,7 @@ services:
       - JwtSettings__Issuer=DriverServicesApi
       - JwtSettings__Audience=DriverServicesClient
       - JwtSettings__ExpirationMinutes=1440
+      - ORDER_SERVICE_URL=http://order-service:8000
     ports:
       - "8001:8080"
     depends_on:
