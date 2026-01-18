@@ -93,3 +93,27 @@ def soft_delete_user(
     db.commit()
     db.refresh(user)
     return user
+
+@router.get("/users/{user_id}", response_model=AdminUserResponse)
+def get_user_detail(
+    user_id: int,
+    db: Session = Depends(get_db),
+    admin: User = Depends(require_admin),
+):
+    user = (
+        db.query(User)
+        .filter(
+            User.id == user_id,
+            User.id != admin.id,
+            User.is_deleted == False
+        )
+        .first()
+    )
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    return user
