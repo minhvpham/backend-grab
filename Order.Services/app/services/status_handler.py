@@ -43,7 +43,34 @@ class StatusHandler:
         # Send request to Driver Services to initiate driver assignment
         # This is a fire-and-forget operation
         try:
-            await driver_service.initiate_driver_assignment(str(order.id))
+            # Get restaurant information for pickup details
+            from . import restaurant_service
+
+            restaurant_id = str(order.restaurant_id)
+            restaurant = await restaurant_service.get_restaurant_details(restaurant_id)
+            if not restaurant:
+                print(f"Failed to get restaurant details for order {order.id}")
+                return
+
+            # Calculate fare (simple calculation based on subtotal + delivery fee)
+            fare = float(order.subtotal + order.delivery_fee)  # type: ignore
+
+            # For now, we'll skip coordinates as they would require geocoding
+            # In a real implementation, you'd geocode the addresses
+            delivery_address = str(order.delivery_address)  # type: ignore
+            customer_notes = str(order.delivery_note) if order.delivery_note else None  # type: ignore
+
+            await driver_service.initiate_driver_assignment(
+                order_id=str(order.id),
+                pickup_address=restaurant.address,
+                pickup_lat=None,  # Would need geocoding
+                pickup_lng=None,  # Would need geocoding
+                delivery_address=delivery_address,
+                delivery_lat=None,  # Would need geocoding
+                delivery_lng=None,  # Would need geocoding
+                fare=fare,
+                customer_notes=customer_notes,
+            )
         except Exception as e:
             # Log error but don't fail the status update
             print(f"Failed to initiate driver assignment for order {order.id}: {e}")

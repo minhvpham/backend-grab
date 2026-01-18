@@ -13,23 +13,6 @@ router = APIRouter(
 )
 
 
-@router.get("/nearby-drivers")
-async def get_nearby_drivers(
-    latitude: float,
-    longitude: float,
-    radius: float = 5.0
-):
-    """
-    Tìm tài xế gần đây (từ Driver Service)
-    """
-    drivers = await driver_service.find_nearby_drivers(latitude, longitude, radius)
-    return {
-        "success": True,
-        "message": "Tìm thấy tài xế",
-        "data": drivers
-    }
-
-
 @router.post("/", response_model=schemas.OrderSingleResponse, status_code=201)
 async def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
     """
@@ -235,45 +218,4 @@ def read_restaurant_orders(
         message="Lấy danh sách đơn hàng nhà hàng thành công",
         data=orders,
         total=len(orders)
-    )
-
-
-# Assign driver to order
-@router.post("/{order_id}/assign-driver", response_model=schemas.OrderSingleResponse)
-async def assign_driver_to_order(
-    order_id: str, 
-    driver_id: str = Query(..., description="ID của driver"),
-    db: Session = Depends(get_db)
-):
-    """
-    Gán driver cho đơn hàng (Gọi Driver Service tạo Trip)
-    """
-    # 1. Get Order
-    db_order = crud.get_order(db, order_id=order_id)
-    if not db_order:
-         raise HTTPException(status_code=404, detail="Đơn hàng không tồn tại")
-    
-    # 2. Get Restaurant Info (for pickup address)
-    restaurant = await restaurant_service.get_restaurant_details(db_order.restaurant_id)
-    if not restaurant:
-        raise HTTPException(status_code=400, detail="Không tìm thấy thông tin nhà hàng")
-        
-    # 3. Create Trip in Driver Service
-    trip = await driver_service.assign_order_to_driver(
-        driver_id=driver_id,
-        order_id=order_id,
-        pickup=restaurant.address,
-        delivery=db_order.delivery_address
-    )
-    
-    if not trip:
-        raise HTTPException(status_code=400, detail="Không thể tạo chuyến đi bên Driver Service")
-
-    # 4. Update Local Order Status (finding_driver / waiting for accept)
-    updated_order = crud.assign_driver(db=db, order_id=order_id, driver_id=driver_id)
-    
-    return schemas.OrderSingleResponse(
-        success=True,
-        message="Đã gửi yêu cầu gán tài xế",
-        data=updated_order
     )
