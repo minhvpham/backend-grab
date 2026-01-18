@@ -65,6 +65,7 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
                 case TripStatus.Accepted:
                     trip.Accept();
                     orderStatusUpdate = "delivering";
+                    orderStatusUpdate = "driver_accepted";
                     driver.MarkAsBusy();
                     break;
 
@@ -87,7 +88,7 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
                     var createResult = await _mediator.Send(command, cancellationToken);
                     if (createResult.IsFailure)
                     {
-                        orderStatusUpdate = "all_driver_rejected";
+                        orderStatusUpdate = "driver_rejected";
                     }
                     break;
 
