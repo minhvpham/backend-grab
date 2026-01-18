@@ -30,8 +30,8 @@ services:
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_DB: order_service_db
-      RESTAURANT_SERVICE_URL: http://localhost:8004
-      DRIVER_SERVICE_URL: http://localhost:8001
+      RESTAURANT_SERVICE_URL: http://restaurants-service:8080
+      DRIVER_SERVICE_URL: http://driver-service:8080
     ports:
       - "8002:8000"
     depends_on:
@@ -79,7 +79,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:united_password@postgres:5432/restaurants_services
     ports:
-      - "8004:8080"
+      - "8004:8081"
     depends_on:
       postgres:
         condition: service_healthy

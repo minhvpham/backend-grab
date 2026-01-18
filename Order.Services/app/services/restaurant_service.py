@@ -5,7 +5,7 @@ from typing import Optional, Dict, Any
 from dataclasses import dataclass
 
 # Config
-RESTAURANT_SERVICE_URL = os.getenv("RESTAURANT_SERVICE_URL", "http://restaurants-service:8080")
+RESTAURANT_SERVICE_URL = os.getenv("RESTAURANT_SERVICE_URL", "http://localhost:8004")
 TIMEOUT = 10.0
 
 @dataclass
@@ -22,7 +22,7 @@ class RestaurantServiceClient:
     async def get_restaurant_info(self, restaurant_id: str) -> Optional[RestaurantInfo]:
         try:
             async with httpx.AsyncClient(timeout=TIMEOUT) as client:
-                response = await client.get(f"{self.base_url}/api/Restaurants/{restaurant_id}")
+                response = await client.get(f"{self.base_url}/api/v1/restaurants/{restaurant_id}")
                 response.raise_for_status()
                 data = response.json()
                 return RestaurantInfo(

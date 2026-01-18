@@ -88,13 +88,13 @@ async def update_order(
         StatusHandler = None
 
     # Validate status transition if status is being updated
-    if order_update.status and StatusHandler:
-        handler = StatusHandler(db)
-        if not handler.validate_status_transition(db_order.status, order_update.status):
-            raise HTTPException(
-                status_code=400,
-                detail=f"Invalid status transition from {db_order.status} to {order_update.status.value}",
-            )
+    # if order_update.status and StatusHandler:
+    #     handler = StatusHandler(db)
+    #     if not handler.validate_status_transition(db_order.status, order_update.status):
+    #         raise HTTPException(
+    #             status_code=400,
+    #             detail=f"Invalid status transition from {db_order.status} to {order_update.status.value}",
+    #         )
 
     updated_order = crud.update_order(
         db=db, order_id=order_id, order_update=order_update
