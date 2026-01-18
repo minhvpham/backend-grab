@@ -12,6 +12,12 @@ from app.schemas.menu import (
     MenuItemUpdate,
     MenuItemResponse
 )
+from app.schemas.promotion import (
+    PromotionBase,
+    PromotionCreate,
+    PromotionUpdate,
+    PromotionResponse
+)
 
 __all__ = [
     "RestaurantBase",
@@ -23,5 +29,9 @@ __all__ = [
     "CategoryResponse",
     "MenuItemCreate",
     "MenuItemUpdate",
-    "MenuItemResponse"
+    "MenuItemResponse",
+    "PromotionBase",
+    "PromotionCreate",
+    "PromotionUpdate",
+    "PromotionResponse"
 ]
