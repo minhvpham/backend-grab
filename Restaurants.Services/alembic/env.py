@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 # ---------------------------------------------------------
 from app.db.base import Base
 # IMPORT ALL MODELS HERE so Alembic can see them!
-from app.models import Restaurant, RestaurantStatus, Category, MenuItem  
+from app.models import Restaurant, RestaurantStatus, Category, MenuItem, Promotion, DiscountType  
 
 config = context.config
 if config.config_file_name is not None:
