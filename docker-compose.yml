@@ -13,7 +13,6 @@ services:
       - "5432:5432" # Use standard port 5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      # Only create databases, let services handle schema with migrations
       - ./init-united-db.sql:/docker-entrypoint-initdb.d/00-create-databases.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -31,6 +30,8 @@ services:
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_DB: order_service_db
+      RESTAURANT_SERVICE_URL: http://restaurants-service:8080
+      DRIVER_SERVICE_URL: http://driver-service:8080
     ports:
       - "8002:8000"
     depends_on:
@@ -50,6 +51,7 @@ services:
       - JwtSettings__Issuer=DriverServicesApi
       - JwtSettings__Audience=DriverServicesClient
       - JwtSettings__ExpirationMinutes=1440
+      - ORDER_SERVICE_URL=http://order-service:8000
     ports:
       - "8001:8080"
     depends_on:

@@ -18,6 +18,11 @@ public class TripHistoryConfiguration : IEntityTypeConfiguration<TripHistory>
         builder.Property(th => th.DriverId)
             .IsRequired();
 
+        builder.HasOne(th => th.Driver)
+            .WithMany()
+            .HasForeignKey(th => th.DriverId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.Property(th => th.OrderId)
             .IsRequired()
             .HasMaxLength(100);

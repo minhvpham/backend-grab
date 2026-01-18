@@ -8,5 +8,6 @@ public enum TripStatus
     InTransit = 4,       // On the way to customer
     Delivered = 5,       // Successfully delivered
     Cancelled = 6,       // Trip was cancelled
-    Failed = 7           // Delivery failed
+    Failed = 7,          // Delivery failed
+    Rejected = 8         // Driver rejected assignment
 }

@@ -1,9 +1,11 @@
+using Driver.Services.Application.TripHistories.Commands.CancelTrip;
+using Driver.Services.Application.TripHistories.Commands.CompleteTrip;
 using Driver.Services.Application.TripHistories.Commands.CreateTrip;
 using Driver.Services.Application.TripHistories.Commands.UpdateTripStatus;
-using Driver.Services.Application.TripHistories.Commands.CompleteTrip;
-using Driver.Services.Application.TripHistories.Commands.CancelTrip;
-using Driver.Services.Application.TripHistories.Queries.GetTripById;
 using Driver.Services.Application.TripHistories.Queries.GetDriverTrips;
+using Driver.Services.Application.TripHistories.Queries.GetTripById;
+using Driver.Services.Application.TripHistories.Queries.GetTrips;
+using Driver.Services.Domain.AggregatesModel.TripHistoryAggregate;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -54,18 +56,19 @@ public class TripsController : ControllerBase
     }
 
     /// <summary>
-    /// Get driver's trips
+    /// Get driver's trips with optional filters
     /// </summary>
     [HttpGet("driver/{driverId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetDriverTrips(
         string driverId,
-        [FromQuery] bool activeOnly = false,
+        [FromQuery] TripStatus? status = null,
+        [FromQuery] string? searchTerm = null,
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 20,
         CancellationToken cancellationToken = default)
     {
-        var query = new GetDriverTripsQuery(driverId, activeOnly, pageNumber, pageSize);
+        var query = new GetTripsQuery(driverId, pageNumber, pageSize, status, searchTerm);
         var result = await _mediator.Send(query, cancellationToken);
 
         if (result.IsFailure)
@@ -75,7 +78,7 @@ public class TripsController : ControllerBase
     }
 
     /// <summary>
-    /// Update trip status (accept, pickup, start_delivery)
+    /// Update trip status (accept, reject, pickup, start_delivery)
     /// </summary>
     [HttpPatch("{id}/status")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -83,7 +86,7 @@ public class TripsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateStatus(string id, [FromBody] UpdateStatusRequest request, CancellationToken cancellationToken)
     {
-        var command = new UpdateTripStatusCommand(id, request.Action);
+        var command = new UpdateTripStatusCommand(id, request.Status);
         var result = await _mediator.Send(command, cancellationToken);
 
         if (result.IsFailure)
@@ -135,6 +138,6 @@ public class TripsController : ControllerBase
     }
 }
 
-public record UpdateStatusRequest(string Action);
+public record UpdateStatusRequest(TripStatus Status);
 public record CompleteTripRequest(decimal? CashCollected, string? DriverNotes);
 public record CancelTripRequest(string Reason);

@@ -26,6 +26,11 @@ class OrderStatus(str, enum.Enum):
     DELIVERING = "delivering"
     DELIVERED = "delivered"
     CANCELLED = "cancelled"
+    PENDING_RESTAURANT = "pending_restaurant"
+    RESTAURANT_REJECTED = "restaurant_rejected"
+    RESTAURANT_ACCEPTED = "restaurant_accepted"
+    DRIVER_ACCEPTED = "driver_accepted"
+    DRIVER_REJECTED = "driver_rejected"
 
 
 class PaymentStatus(str, enum.Enum):
@@ -51,7 +56,8 @@ class Profile(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationship to orders
-    orders = relationship("Order", back_populates="profile")
+    # Relationship to orders
+    # orders = relationship("Order", back_populates="profile")
 
     def __repr__(self):
         return f"<Profile(user_id={self.user_id}, name={self.name}, email={self.email})>"
@@ -62,11 +68,11 @@ class Order(Base):
     __tablename__ = "orders"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(String(255), ForeignKey("profiles.user_id"), nullable=False, index=True)  # FK to Profile
-    restaurant_id = Column(UUID(as_uuid=True), nullable=False, index=True)  # FK to Restaurant service
-    driver_id = Column(UUID(as_uuid=True), nullable=True, index=True)  # FK to Driver service
-    
-    status = Column(String(30), default="pending", nullable=False)
+    user_id = Column(String(255), nullable=False, index=True)  # FK to Profile (Removed constraint)
+    restaurant_id = Column(String(255), nullable=False, index=True)  # FK to Restaurant service
+    driver_id = Column(String(255), nullable=True, index=True)  # FK to Driver service
+
+    status = Column(String(30), default="pending_restaurant", nullable=False)
     payment_status = Column(String(20), default="unpaid", nullable=False)
     payment_method = Column(String(50), nullable=True)
     
@@ -82,7 +88,8 @@ class Order(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
-    profile = relationship("Profile", back_populates="orders")
+    # Relationships
+    # profile = relationship("Profile", back_populates="orders")
     items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
 
     def __repr__(self):
@@ -95,7 +102,7 @@ class OrderItem(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     order_id = Column(UUID(as_uuid=True), ForeignKey("orders.id"), nullable=False)
-    product_id = Column(UUID(as_uuid=True), nullable=False)  # FK to Restaurant service menu
+    product_id = Column(String(255), nullable=False)  # FK to Restaurant service menu
     
     product_name = Column(String(255), nullable=False)
     quantity = Column(Integer, nullable=False, default=1)

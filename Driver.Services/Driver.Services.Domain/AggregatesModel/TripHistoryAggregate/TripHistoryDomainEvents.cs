@@ -18,6 +18,14 @@ public record TripAcceptedDomainEvent(
     public DateTimeOffset OccurredOn { get; } = DateTimeOffset.UtcNow;
 }
 
+public record TripRejectedDomainEvent(
+    string TripId,
+    string DriverId,
+    string OrderId) : IDomainEvent
+{
+    public DateTimeOffset OccurredOn { get; } = DateTimeOffset.UtcNow;
+}
+
 public record TripPickedUpDomainEvent(
     string TripId,
     string DriverId,

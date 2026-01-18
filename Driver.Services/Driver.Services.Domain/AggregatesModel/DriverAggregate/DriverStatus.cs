@@ -4,5 +4,6 @@ public enum DriverStatus
 {
     Offline = 0,
     Online = 1,
-    Busy = 2
+    Busy = 2,
+    WaitingForAcceptance = 3
 }

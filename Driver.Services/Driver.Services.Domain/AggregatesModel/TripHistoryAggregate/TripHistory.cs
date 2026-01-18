@@ -1,11 +1,14 @@
 using Driver.Services.Domain.Abstractions;
+using Driver.Services.Domain.AggregatesModel.DriverAggregate;
 using Driver.Services.Domain.Exceptions;
+using DriverEntity = Driver.Services.Domain.AggregatesModel.DriverAggregate.Driver;
 
 namespace Driver.Services.Domain.AggregatesModel.TripHistoryAggregate;
 
 public class TripHistory : Entity<string>, IAggregateRoot
 {
     public string DriverId { get; private set; } = string.Empty;
+    public DriverEntity? Driver { get; private set; }
     public string OrderId { get; private set; }
     public TripStatus Status { get; private set; }
     
@@ -31,6 +34,7 @@ public class TripHistory : Entity<string>, IAggregateRoot
     public DateTime? PickedUpAt { get; private set; }
     public DateTime? DeliveredAt { get; private set; }
     public DateTime? CancelledAt { get; private set; }
+    public DateTime? RejectedAt { get; private set; }
     
     // Additional info
     public string? CancellationReason { get; private set; }
@@ -101,6 +105,18 @@ public class TripHistory : Entity<string>, IAggregateRoot
         UpdatedAt = DateTime.UtcNow;
 
         AddDomainEvent(new TripAcceptedDomainEvent(Id, DriverId, OrderId));
+    }
+
+    public void Reject()
+    {
+        if (Status != TripStatus.Assigned)
+            throw new DomainValidationException($"Cannot reject trip in {Status} status");
+
+        Status = TripStatus.Rejected;
+        RejectedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
+
+        AddDomainEvent(new TripRejectedDomainEvent(Id, DriverId, OrderId));
     }
 
     public void MarkAsPickedUp()
@@ -204,7 +220,9 @@ public class TripHistory : Entity<string>, IAggregateRoot
     public bool IsCompleted() => Status == TripStatus.Delivered;
     public bool IsCancelled() => Status == TripStatus.Cancelled;
     public bool IsFailed() => Status == TripStatus.Failed;
+    public bool IsRejected() => Status == TripStatus.Rejected;
     public bool IsActive() => Status != TripStatus.Delivered && 
                               Status != TripStatus.Cancelled && 
-                              Status != TripStatus.Failed;
+                              Status != TripStatus.Failed &&
+                              Status != TripStatus.Rejected;
 }

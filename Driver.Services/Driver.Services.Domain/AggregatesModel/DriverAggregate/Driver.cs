@@ -67,8 +67,8 @@ public class Driver : Entity<string>, IAggregateRoot
 
     public void GoOffline()
     {
-        if (Status == DriverStatus.Busy)
-            throw new DomainValidationException("Cannot go offline while busy with an order");
+        if (Status == DriverStatus.Busy || Status == DriverStatus.WaitingForAcceptance)
+            throw new DomainValidationException("Cannot go offline while busy with an order or waiting for acceptance");
 
         Status = DriverStatus.Offline;
         UpdateUpdatedAt(DateTimeOffset.UtcNow);
@@ -85,10 +85,19 @@ public class Driver : Entity<string>, IAggregateRoot
 
     public void MarkAsAvailable()
     {
-        if (Status != DriverStatus.Busy)
-            throw new DomainValidationException("Driver must be busy to be marked as available");
+        if (Status != DriverStatus.Busy && Status != DriverStatus.WaitingForAcceptance)
+            throw new DomainValidationException("Driver must be busy or waiting for acceptance to be marked as available");
 
         Status = DriverStatus.Online;
+        UpdateUpdatedAt(DateTimeOffset.UtcNow);
+    }
+
+    public void MarkAsWaitingForAcceptance()
+    {
+        if (Status != DriverStatus.Online)
+            throw new DomainValidationException("Driver must be online to be marked as waiting for acceptance");
+
+        Status = DriverStatus.WaitingForAcceptance;
         UpdateUpdatedAt(DateTimeOffset.UtcNow);
     }
 

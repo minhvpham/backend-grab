@@ -3,6 +3,7 @@ using Driver.Services.Domain.Abstractions;
 using Driver.Services.Domain.AggregatesModel.DriverAggregate;
 using Driver.Services.Domain.AggregatesModel.TripHistoryAggregate;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Driver.Services.Application.TripHistories.Commands.CreateTrip;
 
@@ -15,35 +16,55 @@ public class CreateTripCommandHandler : IRequestHandler<CreateTripCommand, Resul
     public CreateTripCommandHandler(
         IDriverRepository driverRepository,
         ITripHistoryRepository tripRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork
+    )
     {
         _driverRepository = driverRepository;
         _tripRepository = tripRepository;
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<string>> Handle(CreateTripCommand request, CancellationToken cancellationToken)
+    public async Task<Result<string>> Handle(
+        CreateTripCommand request,
+        CancellationToken cancellationToken
+    )
     {
-        // Verify driver exists
-        var driver = await _driverRepository.GetByIdAsync(request.DriverId, cancellationToken);
-        if (driver == null)
+        // Check if order has any rejected trip history
+        var tripQuery = await _tripRepository.GetAllAsync(cancellationToken);
+
+        // Choose any online driver who hasn't rejected this order
+        var onlineDrivers = await _driverRepository.GetOnlineDriversAsync(cancellationToken);
+        if (!onlineDrivers.Any())
         {
             return Result.Failure<string>(
-                Error.NotFound("Driver.NotFound", $"Driver with ID '{request.DriverId}' not found."));
+                Error.NotFound("Driver.NoAvailable", "No online drivers found.")
+            );
         }
 
-        // Check if order already has a trip
-        var existingTrip = await _tripRepository.GetByOrderIdAsync(request.OrderId, cancellationToken);
-        if (existingTrip != null)
+        Driver.Services.Domain.AggregatesModel.DriverAggregate.Driver? selectedDriver =
+            onlineDrivers
+                .Where(d =>
+                    !tripQuery.Any(t =>
+                        t.DriverId == d.Id
+                        && t.OrderId == request.OrderId
+                        && t.Status == TripStatus.Rejected
+                    )
+                )
+                .FirstOrDefault();
+        if (selectedDriver == null)
         {
             return Result.Failure<string>(
-                Error.Conflict("Trip.OrderExists", $"Order '{request.OrderId}' already has a trip."));
+                Error.NotFound(
+                    "Driver.NoEligible",
+                    "No eligible drivers found (all have rejected this order)."
+                )
+            );
         }
 
         try
         {
             var trip = TripHistory.Create(
-                request.DriverId,
+                selectedDriver.Id,
                 request.OrderId,
                 request.PickupAddress,
                 request.PickupLatitude,
@@ -52,7 +73,8 @@ public class CreateTripCommandHandler : IRequestHandler<CreateTripCommand, Resul
                 request.DeliveryLatitude,
                 request.DeliveryLongitude,
                 request.Fare,
-                request.CustomerNotes);
+                request.CustomerNotes
+            );
 
             _tripRepository.Add(trip);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -61,8 +83,7 @@ public class CreateTripCommandHandler : IRequestHandler<CreateTripCommand, Resul
         }
         catch (Exception ex)
         {
-            return Result.Failure<string>(
-                Error.Validation("Trip.CreateFailed", ex.Message));
+            return Result.Failure<string>(Error.Validation("Trip.CreateFailed", ex.Message));
         }
     }
 }

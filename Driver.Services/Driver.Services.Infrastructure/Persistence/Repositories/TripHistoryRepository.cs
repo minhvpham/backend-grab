@@ -86,6 +86,11 @@ public class TripHistoryRepository : ITripHistoryRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IQueryable<TripHistory>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await Task.FromResult(_context.TripHistories.AsQueryable());
+    }
+
     public async Task<int> GetTotalTripsCountAsync(
         string driverId,
         CancellationToken cancellationToken = default)
