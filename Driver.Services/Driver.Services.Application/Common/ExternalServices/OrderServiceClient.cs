@@ -20,7 +20,7 @@ public class OrderServiceClient : IOrderServiceClient
         try
         {
             var requestBody = new { status = status, driver_id = driverId };
-            var response = await _httpClient.PutAsJsonAsync($"/orders/{orderId}", requestBody);
+            var response = await _httpClient.PutAsJsonAsync($"/api/v1/orders/{orderId}", requestBody);
 
             if (response.IsSuccessStatusCode)
             {

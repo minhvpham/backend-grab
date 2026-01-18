@@ -93,7 +93,6 @@ builder.Services.AddHttpClient("OrderService", client =>
     var orderServiceUrl = builder.Configuration["ORDER_SERVICE_URL"] ?? "http://order-service:8000";
     client.BaseAddress = new Uri(orderServiceUrl);
     client.DefaultRequestHeaders.Add("Accept", "application/json");
-    client.DefaultRequestHeaders.Add("Content-Type", "application/json");
 })
 .AddPolicyHandler(GetRetryPolicy())
 .AddPolicyHandler(GetCircuitBreakerPolicy());
