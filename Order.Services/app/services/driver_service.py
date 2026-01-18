@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 
 # Config
-DRIVER_SERVICE_URL = os.getenv("DRIVER_SERVICE_URL", "http://driver-service:8081")
+DRIVER_SERVICE_URL = os.getenv("DRIVER_SERVICE_URL", "http://driver-service:8080")
 TIMEOUT = 10.0  # seconds
 
 
@@ -62,7 +62,6 @@ class DriverServiceClient:
         try:
             async with httpx.AsyncClient(timeout=TIMEOUT) as client:
                 payload = {
-                    "driverId": driver_id,
                     "orderId": order_id,
                     "pickupAddress": pickup_address,
                     "deliveryAddress": delivery_address,
