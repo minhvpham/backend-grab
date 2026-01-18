@@ -45,6 +45,7 @@ class PromotionUpdate(BaseModel):
     is_active: Optional[bool] = None
     end_date: Optional[date] = None
     usage_limit: Optional[int] = None
+    used_count: Optional[int] = Field(None, ge=0)
 
 
 class PromotionResponse(PromotionBase):
