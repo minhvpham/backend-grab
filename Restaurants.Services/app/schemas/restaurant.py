@@ -28,7 +28,7 @@ class RestaurantUpdate(BaseModel):
     opening_hours: Optional[str] = None
     business_license_image: Optional[str] = None
     food_safety_certificate_image: Optional[str] = None
-    # Only Admin should update status
+    status: Optional[RestaurantStatus] = None  # Allow status updates
 
 
 class RestaurantResponse(RestaurantBase):
