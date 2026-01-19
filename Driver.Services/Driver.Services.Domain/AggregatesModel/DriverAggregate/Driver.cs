@@ -39,7 +39,7 @@ public class Driver : Entity<string>, IAggregateRoot
             FullName = ValidateFullName(fullName),
             PhoneNumber = new PhoneNumber(phoneNumber),
             Email = ValidateEmail(email),
-            Status = DriverStatus.Offline,
+            Status = DriverStatus.Online,
             VerificationStatus = VerificationStatus.Pending,
             LicenseNumber = licenseNumber?.Trim(),
             CitizenIdImageUrl = citizenIdImageUrl?.Trim(),
