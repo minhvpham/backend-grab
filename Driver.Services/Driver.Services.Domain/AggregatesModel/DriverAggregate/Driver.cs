@@ -76,8 +76,8 @@ public class Driver : Entity<string>, IAggregateRoot
 
     public void MarkAsBusy()
     {
-        if (Status != DriverStatus.Online)
-            throw new DomainValidationException("Driver must be online to be marked as busy");
+        if (Status != DriverStatus.Online && Status != DriverStatus.WaitingForAcceptance)
+            throw new DomainValidationException("Driver must be online or waiting for acceptance to be marked as busy");
 
         Status = DriverStatus.Busy;
         UpdateUpdatedAt(DateTimeOffset.UtcNow);

@@ -63,10 +63,9 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
             switch (request.Status)
             {
                 case TripStatus.Accepted:
-                    trip.Accept();
-                    orderStatusUpdate = "delivering";
-                    orderStatusUpdate = "driver_accepted";
+                    trip.Accept(); // This raises TripAcceptedDomainEvent
                     driver.MarkAsBusy();
+                    // Order status update will be handled asynchronously by TripAcceptedDomainEventHandler
                     break;
 
                 case TripStatus.Rejected:
