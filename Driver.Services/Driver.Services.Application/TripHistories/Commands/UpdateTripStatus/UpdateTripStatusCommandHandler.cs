@@ -70,26 +70,10 @@ public class UpdateTripStatusCommandHandler : IRequestHandler<UpdateTripStatusCo
                     break;
 
                 case TripStatus.Rejected:
-                    trip.Reject();
+                    trip.Reject(); // This raises TripRejectedDomainEvent
                     driver.MarkAsAvailable();
                     // Order status remains "delivering"
-                    // Find another driver
-                    var command = new CreateTripCommand(
-                        trip.OrderId,
-                        trip.PickupAddress,
-                        trip.PickupLatitude,
-                        trip.PickupLongitude,
-                        trip.DeliveryAddress,
-                        trip.DeliveryLatitude,
-                        trip.DeliveryLongitude,
-                        trip.Fare,
-                        trip.CustomerNotes
-                    );
-                    var createResult = await _mediator.Send(command, cancellationToken);
-                    if (createResult.IsFailure)
-                    {
-                        orderStatusUpdate = "driver_rejected";
-                    }
+                    // Trip reassignment will be handled asynchronously by TripRejectedDomainEventHandler
                     break;
 
                 case TripStatus.PickedUp:
