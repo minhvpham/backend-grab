@@ -8,6 +8,7 @@ using Driver.Services.Domain.AggregatesModel.TripHistoryAggregate;
 using Driver.Services.Infrastructure.Persistence;
 using Driver.Services.Infrastructure.Persistence.Repositories;
 using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Polly;
 using Polly.Extensions.Http;
@@ -57,7 +58,12 @@ builder.Services.AddScoped<IDriverWalletRepository, DriverWalletRepository>();
 builder.Services.AddScoped<ITripHistoryRepository, TripHistoryRepository>();
 
 // Add UnitOfWork
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IUnitOfWork>(sp =>
+{
+    var context = sp.GetRequiredService<DriverServicesDbContext>();
+    var mediator = sp.GetRequiredService<IMediator>();
+    return new UnitOfWork(context, mediator);
+});
 
 // Add MediatR and Application layer dependencies
 builder.Services.AddMediatR(cfg =>

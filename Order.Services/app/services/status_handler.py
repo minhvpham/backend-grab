@@ -53,7 +53,7 @@ class StatusHandler:
                 return
 
             # Calculate fare (simple calculation based on subtotal + delivery fee)
-            fare = float(order.subtotal + order.delivery_fee)  # type: ignore
+            fare = float(order.delivery_fee)  # type: ignore
 
             # For now, we'll skip coordinates as they would require geocoding
             # In a real implementation, you'd geocode the addresses
