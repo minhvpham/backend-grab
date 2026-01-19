@@ -56,7 +56,7 @@ async def update_user_status(
             RESTAURANT_STATUS_MAP = {
                 "pending": "PENDING",
                 "active": "ACTIVE",
-                "reject": "REJECTED",
+                "inactive": "REJECTED",
                 "banned": "BANNED",
             }
 
