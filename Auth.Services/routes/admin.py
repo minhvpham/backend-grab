@@ -109,7 +109,7 @@ async def update_user_status(
                 )
 
         # ================= DRIVER =================
-        elif user.role == RoleEnum.driver:
+        elif user.role == RoleEnum.shipper:
             if not DRIVER_SERVICE_URL:
                 raise HTTPException(
                     status_code=500,
