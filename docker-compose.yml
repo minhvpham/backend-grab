@@ -54,6 +54,8 @@ services:
       - ORDER_SERVICE_URL=http://order-service:8000
     ports:
       - "8001:8080"
+    volumes:
+      - ./Driver.Services/uploads:/app/uploads
     depends_on:
       postgres:
         condition: service_healthy
@@ -83,6 +85,8 @@ services:
       - DATABASE_URL=postgresql://postgres:united_password@postgres:5432/restaurants_services
     ports:
       - "8004:8080"
+    volumes:
+      - ./Restaurants.Services/uploads:/app/uploads
     depends_on:
       postgres:
         condition: service_healthy
