@@ -10,6 +10,7 @@ class RoleEnum(str, enum.Enum):
 
 class UserStatusEnum(str, enum.Enum):
     active = "active"        # Tài khoản hoạt động bình thường
+    reject = "reject"
     inactive = "inactive"    # Bị admin vô hiệu hóa
     pending = "pending"      # Chờ xác minh (email, KYC, ...)
     banned = "banned"        # Bị cấm vĩnh viễn

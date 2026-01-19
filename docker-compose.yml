@@ -66,6 +66,8 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:united_password@postgres:5432/auth_services
       - SECRET_KEY=SECRET_KEY_CHANGE_ME
+      - RESTAURANT_SERVICE_URL=http://restaurants-service:8080
+      - DRIVER_SERVICE_URL=http://driver-service:8080
     ports:
       - "8003:8000"
     depends_on:
