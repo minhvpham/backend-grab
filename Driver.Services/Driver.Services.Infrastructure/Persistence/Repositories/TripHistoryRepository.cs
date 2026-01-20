@@ -30,7 +30,9 @@ public class TripHistoryRepository : ITripHistoryRepository
         CancellationToken cancellationToken = default)
     {
         return await _context.TripHistories
-            .FirstOrDefaultAsync(th => th.OrderId == orderId, cancellationToken);
+            .Where(th => th.OrderId == orderId)
+            .OrderByDescending(th => th.CreatedAt)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<IReadOnlyList<TripHistory>> GetByDriverIdAsync(

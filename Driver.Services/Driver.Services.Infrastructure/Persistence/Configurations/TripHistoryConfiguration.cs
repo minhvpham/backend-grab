@@ -105,8 +105,7 @@ public class TripHistoryConfiguration : IEntityTypeConfiguration<TripHistory>
         // Indexes
         builder.HasIndex(th => th.DriverId);
 
-        builder.HasIndex(th => th.OrderId)
-            .IsUnique();
+        builder.HasIndex(th => th.OrderId);
 
         builder.HasIndex(th => th.Status);
 
